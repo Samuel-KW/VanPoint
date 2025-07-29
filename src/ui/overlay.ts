@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { scene, camera, renderer } from "./canvas";
-import type { ImageLoadDetail } from "../utils/load_image";
+import type { ImageLoadDetail } from "./load_image";
 
 const geometry = new THREE.PlaneGeometry(1, 1); // Placeholder, resized later
 const material = new THREE.MeshBasicMaterial({
@@ -36,25 +36,25 @@ export const setImage = (imageUrl: string, data: ImageLoadDetail) => {
 
 const updateOverlay = (imgAspect: number) => {
 	const viewAspect = window.innerWidth / window.innerHeight;
-	debugger
 	const isContainFit = imgAspect <= viewAspect;
 
-	const distance = isContainFit
-		? 1 / (2 * tanHalfFov()) // based on image height
-		: 1 / (2 * Math.tan(hfovFromVfov(camera.fov, viewAspect) / 2)); // based on image width
+	const img = material.map!.image as HTMLImageElement;
+	const width = img.naturalWidth;
+	const height = img.naturalHeight;
 
-	const height = 2 * distance * tanHalfFov();
-	const width = height * imgAspect;
+	const distance = isContainFit
+		? height / (2 * tanHalfFov())
+		: width / (2 * Math.tan(hfovFromVfov(camera.fov, viewAspect) / 2));
 
 	mesh.geometry.dispose();
 	mesh.geometry = new THREE.PlaneGeometry(width, height);
 
-	// Position the mesh in front of the camera
 	const camDir = new THREE.Vector3();
 	camera.getWorldDirection(camDir);
 	mesh.position.copy(camera.position).add(camDir.multiplyScalar(distance));
 
-	mesh.lookAt(camera.position); // Make it face the camera
+	// Align plane to face the same direction as camera
+	mesh.quaternion.copy(camera.quaternion);
 };
 
 const hfovFromVfov = (vfovDeg: number, aspect: number) =>

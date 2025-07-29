@@ -1,4 +1,4 @@
-import type { ImageLoadDetail } from "../utils/load_image";
+import type { ImageLoadDetail } from "./load_image";
 import { setImage } from "./overlay";
 
 const overlay = document.getElementById("start-overlay") as HTMLDivElement;

@@ -4,6 +4,8 @@ import "./styles/start_screen.css"
 import "./styles/canvas.css"
 import "./ui/canvas"
 import "./ui/start"
-import "./utils/load_image"
+import "./ui/toolbar"
+import "./ui/overlay"
+import "./ui/load_image"
 
 console.log("VanPoint initialized");
