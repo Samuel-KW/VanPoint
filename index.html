@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+	<meta name="viewport"
+		content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, height=device-height" />
+	<title>VanPoint | Perspective Matcher</title>
+</head>
+
+<body>
+
+	<div id="start-overlay">
+		<label id="drop-zone">
+			<p>Drag & Drop or Click to Upload an Image</p>
+			<input type="file" id="file-input" accept="image/*" />
+		</label>
+	</div>
+
+	<div id="canvas-container">
+		<div id="toolbar">
+			<button id="load-image">Load Image</button>
+			<button id="reset-camera">Reset Camera</button>
+			<button id="toggle-grid">Toggle Grid</button>
+			<button id="toggle-axes">Toggle Axes</button>
+			<button id="toggle-helper">Toggle Helper</button>
+			<button id="toggle-image">Toggle Image</button>
+			<button id="toggle-controls">Toggle Controls</button>
+			<button id="toggle-overlay">Toggle Overlay</button>
+			<button id="toggle-cube">Toggle Cube</button>
+		</div>
+		<div id="render-area"></div>
+	</div>	
+
+	
+
+	<script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>

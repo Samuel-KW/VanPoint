@@ -1,0 +1,17 @@
+:root {
+	--bg-color: #242424;
+	--text-color: #ffffff;
+	--primary-color: #6200ea;
+	--secondary-color: #03dac6;
+	--tertiary-color: #018786;
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		--bg-color: #ececec;
+		--text-color: #000000;
+		--primary-color: #6200ea;
+		--secondary-color: #03dac6;
+		--tertiary-color: #018786;
+	}
+}
