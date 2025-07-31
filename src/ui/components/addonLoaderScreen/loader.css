@@ -10,30 +10,47 @@
 	width: 100vw;
 	height: 100vh;
 	background-color: var(--bg-color-6);
-	color: var(--text-color-2);
+	text-align: center;;
 
-	h3, h4 {
-		margin: 0;
-	}
 
 	h3 {
 		font-size: 3em;
 		font-weight: bold;
+		color: var(--text-color-1);
+		margin: 0;
 	}
 
 	h4 {
 		font-size: 2em;
 		font-weight: normal;
-		margin-bottom: .5em;
+		color: var(--text-color-5);
+		margin: 0;
 	}
 
 	progress {
-		width: 50%;
+		width: 75%;
+		max-width: 550px;
 		height: 2em;
-		background-color: green;
+		margin-top: 1em;
+		background-color: var(--bg-color-0);
 		border-radius: 2em;
 		overflow: hidden;
 	}
+
+	progress::-webkit-progress-bar {
+        background-color: var(--bg-color-0);
+		border-radius: 2em;
+    }
+
+    progress::-webkit-progress-value {
+        background-color: var(--primary-5);
+		border-radius: 2em;
+    }
+
+    progress::-moz-progress-bar {
+        background-color: var(--primary-5);
+		border-radius: 2em;
+    }
 }
 
 @keyframes fade-out {

@@ -3,6 +3,7 @@ import type AddonManager from "../../../core/manager";
 import "./loader.css";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const debugDelay = false;
 
 interface AddonMap {
 	[id: string]: (new () => Addon)[];
@@ -43,12 +44,12 @@ export async function loadInitialAddons(manager: AddonManager, addons: AddonMap,
 			progressDetails.textContent = `[1/2] Enabling ${addon.name}`;
 			await manager.register(addon);
 			progressBar.value += 1;
-			if (debug) await sleep(100);
+			if (debug && debugDelay) await sleep(debugDelay);
 
 			progressDetails.textContent = `[2/2] Enabling ${addon.name}`;
 			await manager.enable(addon);
 			progressBar.value += 1;
-			if (debug) await sleep(100);
+			if (debug && debugDelay) await sleep(debugDelay);
 		}
 	}
 
