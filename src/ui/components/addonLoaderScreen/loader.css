@@ -9,7 +9,8 @@
 	left: 0;
 	width: 100vw;
 	height: 100vh;
-	background-color: #444;
+	background-color: var(--bg-color-6);
+	color: var(--text-color-2);
 
 	h3, h4 {
 		margin: 0;

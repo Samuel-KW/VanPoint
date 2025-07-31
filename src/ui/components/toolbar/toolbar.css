@@ -1,0 +1,11 @@
+#toolbar {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: flex-start;
+	align-items: flex-start;
+	position: absolute;
+	background-color: rgba(0, 0, 0, 0.5);
+	width: 100vw;
+	padding: 3px;
+}
