@@ -1,16 +1,16 @@
 import { PerspectiveCamera, Scene, WebGLRenderer } from "three";
 import type { EventBus } from "../core/events";
 
-export abstract class Addon {
-	abstract id: string;
-	abstract name: string;
+export class Addon {
+	id: string = "";
+	name: string = "Unnamed Addon";
 	enabled: boolean = false;
 
-	abstract onRegister(context: AddonContext): Promise<void> | void;
-	abstract onEnable(context: AddonContext): Promise<void> | void;
-	abstract onDisable(context: AddonContext): Promise<void> | void;
-	abstract onDestroy(context: AddonContext): Promise<void> | void;
-	abstract exports(): Record<string, unknown>;
+	onRegister(context: AddonContext): Promise<void> | void { throw new Error("onRegister() method not implemented"); }
+	onEnable(context: AddonContext): Promise<void> | void { throw new Error("onEnable() method not implemented"); }
+	onDisable(context: AddonContext): Promise<void> | void { throw new Error("onDisable() method not implemented"); }
+	onDestroy(context: AddonContext): Promise<void> | void { throw new Error("onDestroy() method not implemented"); }
+	exports(): Record<string, unknown> { throw new Error("exports() method not implemented"); }
 }
 
 export interface AddonContext {
