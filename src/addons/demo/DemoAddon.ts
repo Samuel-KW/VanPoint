@@ -30,7 +30,7 @@ export class DemoAddon extends Addon {
 		ctx.ui.toolbar.appendChild(this.button);
 
 		// Add x/y/z input controls
-		["x", "y", "z"].forEach((axis, i) => {
+		["x", "y", "z"].forEach(axis => {
 			const input = document.createElement("input");
 			input.type = "number";
 			input.placeholder = axis;

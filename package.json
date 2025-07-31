@@ -1,19 +1,19 @@
 {
-  "name": "vanpoint",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "@types/three": "^0.178.1",
-    "typescript": "~5.8.3",
-    "vite": "^7.0.4"
-  },
-  "dependencies": {
-    "three": "^0.178.0"
-  }
+	"name": "vanpoint",
+	"private": false,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc && vite build",
+		"preview": "vite preview"
+	},
+	"devDependencies": {
+		"@types/three": "^0.178.1",
+		"typescript": "^5.9.2",
+		"vite": "^7.0.6"
+	},
+	"dependencies": {
+		"three": "^0.178.0"
+	}
 }
