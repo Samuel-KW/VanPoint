@@ -8,12 +8,19 @@ interface AddonMap {
 	[id: string]: (new () => Addon)[];
 }
 
-const progressHeader = document.getElementById("load-header") as HTMLElement;
-const progressDetails = document.getElementById("load-details") as HTMLElement
-const progressBar = document.getElementById("load-progress") as HTMLProgressElement;
-
 // Register and enable all addons
 export async function loadInitialAddons(manager: AddonManager, addons: AddonMap, debug = false) {
+	
+	const container = document.createElement("div");
+	const progressHeader = document.createElement("h3");
+	const progressDetails = document.createElement("h4")
+	const progressBar = document.createElement("progress");
+
+	container.classList.add("load-container");
+	container.appendChild(progressHeader);
+	container.appendChild(progressDetails);
+	container.appendChild(progressBar);
+	document.body.appendChild(container);
 	
 	// Each addon has register and enable operations
 	progressBar.value = 0;
@@ -48,4 +55,9 @@ export async function loadInitialAddons(manager: AddonManager, addons: AddonMap,
 	progressHeader.textContent = "Finished loading!";
 	progressDetails.textContent = `Took ${Math.round((Date.now() - start) / 10) / 100}s`;
 	progressBar.value = progressBar.max;
+
+	container.style.animation = "fade-out 1s ease-in-out forwards 1s";
+	await sleep(3000);
+
+	container.remove();
 }

@@ -1,4 +1,8 @@
 .load-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 	position: fixed;
 	z-index: 1000;
 	top: 0;
@@ -7,11 +11,35 @@
 	height: 100vh;
 	background-color: #444;
 
+	h3, h4 {
+		margin: 0;
+	}
+
 	h3 {
-		
+		font-size: 3em;
+		font-weight: bold;
 	}
 
 	h4 {
+		font-size: 2em;
+		font-weight: normal;
+		margin-bottom: .5em;
+	}
 
+	progress {
+		width: 50%;
+		height: 2em;
+		background-color: green;
+		border-radius: 2em;
+		overflow: hidden;
+	}
+}
+
+@keyframes fade-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
 	}
 }
