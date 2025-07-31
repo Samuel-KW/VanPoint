@@ -42,6 +42,7 @@ controls.enableZoom = false;
 controls.enablePan = false;
 
 const helper = new ViewHelper(camera, renderer.domElement);
+helper.setLabels("X", "Y", "Z");
 
 function animate() {
 	requestAnimationFrame(animate);
