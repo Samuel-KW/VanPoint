@@ -59,7 +59,6 @@ export default class AddonManager {
 		} catch (e) {
 			console.error(`[Addon] Failed to remove: ${addon.name}`, e);
 		}
-		console.log(`[Addon] Removed: ${addon.name}`);
 	}
 
 	/**
@@ -68,6 +67,14 @@ export default class AddonManager {
 	 * @param addon The addon to enable
 	 */
 	async enable(addon: Addon) {
+		if (!this.addons.has(addon.id)) {
+			console.warn(`[Addon] Cannot enable: ${addon.name} is not registered`);
+			return;
+		}
+		if (addon.enabled) {
+			return;
+		}
+
 		try {
 			if (typeof addon.onEnable === "function") {
 				await addon.onEnable(this.context);
@@ -85,6 +92,14 @@ export default class AddonManager {
 	 * @param addon The addon to disable
 	 */
 	async disable(addon: Addon) {
+		if (!this.addons.has(addon.id)) {
+			console.warn(`[Addon] Cannot disable: ${addon.name} is not registered`);
+			return;
+		}
+		if (!addon.enabled) {
+			return;
+		}
+		
 		try {
 			if (typeof addon.onDisable === "function") {
 				await addon.onDisable(this.context);

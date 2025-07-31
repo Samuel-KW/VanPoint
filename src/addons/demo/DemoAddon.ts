@@ -4,7 +4,6 @@ import { Addon, type AddonContext } from "../Addon";
 export class DemoAddon extends Addon {
 	id = "demo";
 	name = "Demo Addon";
-	enabled = false;
 
 	private cube?: THREE.Mesh;
 	private inputs: HTMLInputElement[] = [];
