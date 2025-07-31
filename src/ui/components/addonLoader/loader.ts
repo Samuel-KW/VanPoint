@@ -43,12 +43,12 @@ export async function loadInitialAddons(manager: AddonManager, addons: AddonMap,
 			progressDetails.textContent = `[1/2] Enabling ${addon.name}`;
 			await manager.register(addon);
 			progressBar.value += 1;
-			if (debug) await sleep(1000);
+			if (debug) await sleep(100);
 
 			progressDetails.textContent = `[2/2] Enabling ${addon.name}`;
 			await manager.enable(addon);
 			progressBar.value += 1;
-			if (debug) await sleep(1000);
+			if (debug) await sleep(100);
 		}
 	}
 

@@ -6,10 +6,10 @@ export class Addon {
 	name: string = "Unnamed Addon";
 	enabled: boolean = false;
 
-	onRegister(context: AddonContext): Promise<void> | void { throw new Error("onRegister() method not implemented"); }
-	onEnable(context: AddonContext): Promise<void> | void { throw new Error("onEnable() method not implemented"); }
-	onDisable(context: AddonContext): Promise<void> | void { throw new Error("onDisable() method not implemented"); }
-	onDestroy(context: AddonContext): Promise<void> | void { throw new Error("onDestroy() method not implemented"); }
+	onRegister(_: AddonContext): Promise<void> | void { throw new Error("onRegister() method not implemented"); }
+	onEnable(_: AddonContext): Promise<void> | void { throw new Error("onEnable() method not implemented"); }
+	onDisable(_: AddonContext): Promise<void> | void { throw new Error("onDisable() method not implemented"); }
+	onDestroy(_: AddonContext): Promise<void> | void { throw new Error("onDestroy() method not implemented"); }
 	exports(): Record<string, unknown> { throw new Error("exports() method not implemented"); }
 }
 
@@ -20,8 +20,9 @@ export interface AddonContext {
 		renderer: WebGLRenderer;
 	};
 	ui: {
-		toolbar: HTMLDivElement;
-		propertyPanel: HTMLDivElement;
+		toolbar: HTMLElement;
+		propertyPanel: HTMLElement;
+		renderArea: HTMLElement;
 	};
 	events: EventBus;
 	exports: <T = any>(id: string) => T;

@@ -15,7 +15,7 @@ export class ViewportAddon extends Addon {
 
 	enabled = false;
 
-	async onRegister(ctx: AddonContext) {
+	async onRegister(_: AddonContext) {
 	}
 
 	async onEnable(ctx: AddonContext) {
@@ -38,7 +38,7 @@ export class ViewportAddon extends Addon {
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setSize(window.innerWidth, window.innerHeight);
 		this.renderer.autoClear = false;
-		document.getElementById("render-area")!.appendChild(this.renderer.domElement);
+		ctx.ui.renderArea.appendChild(this.renderer.domElement);
 
 		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
 		this.controls.enableRotate = false;
@@ -60,9 +60,6 @@ export class ViewportAddon extends Addon {
 		if (!this.scene || !this.camera || !this.renderer || !this.helper || !this.controls) {
 			return;
 		}
-
-		// cube.rotation.x += 0.01;
-		// cube.rotation.y += 0.01;
 		this.renderer.clear();
 		this.controls.update();
 		this.renderer.render(this.scene, this.camera);
@@ -74,17 +71,16 @@ export class ViewportAddon extends Addon {
 		alert("Warning: You have disabled the core viewport addon. This may cause issues with the application.");
 	}
 
-	async onDestroy(_: AddonContext) {
-		this.enabled = false;
+	async onDestroy(ctx: AddonContext) {
 		alert("Warning: You have removed the core viewport addon. This may cause issues with the application.");
-
-		// Clean up scene, renderer, controls, and helpers
+		
+		this.enabled = false;
+		const renderArea = ctx.ui.renderArea;
 		if (this.scene) {
 			this.scene.clear();
 		}
 		if (this.renderer) {
 			this.renderer.dispose();
-			const renderArea = document.getElementById("render-area");
 			if (renderArea) {
 				renderArea.innerHTML = "";
 			}
@@ -95,8 +91,6 @@ export class ViewportAddon extends Addon {
 		if (this.helper) {
 			this.helper.dispose();
 		}
-
-		const renderArea = document.getElementById("render-area");
 		if (renderArea && this.renderer) {
 			renderArea.removeChild(this.renderer.domElement);
 		}

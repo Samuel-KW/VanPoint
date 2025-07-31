@@ -3,7 +3,7 @@ import "./styles/main.css"
 import AddonManager from "./core/manager";
 import { DemoAddon } from "./addons/demo/DemoAddon";
 import { ViewportAddon } from "./addons/viewport/ViewportAddon";
-import { loadInitialAddons } from "./ui/components/loader/loader";
+import { loadInitialAddons } from "./ui/components/addonLoader/loader";
 
 const debug = true;
 
