@@ -1,23 +1,28 @@
-import type { Addon } from "../addons/Addon";
-import type { AddonContext } from "./context";
+import { Scene, PerspectiveCamera, WebGLRenderer } from "three";
+import type { Addon, AddonContext } from "../addons/Addon";
 import { EventBus } from "./events";
 
-export class AddonManager {
-	private addons: Addon[] = [];
+export default class AddonManager {
+	private addons: Map<string, Addon> = new Map();
 	private context: AddonContext;
+	private exports: Record<string, any> = {};
 
 	constructor() {
 		this.context = {
 			viewport: {
-				scene: null,
-				camera: null,
-				renderer: null
+				scene:  new Scene(),
+				camera: new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000),
+				renderer: new WebGLRenderer({ antialias: true })
 			},
 			ui: {
 				toolbar: document.getElementById("toolbar") as HTMLDivElement,
-				propertyPanel: document.getElementById("property-panel") as HTMLDivElement,
+				propertyPanel: document.getElementById("properties") as HTMLDivElement,
 			},
-			events: new EventBus()
+			events: new EventBus(),
+			get exports() {
+				return (id: string) => this._exports[id];
+			},
+			_exports: this.exports
 		}
 	}
 
@@ -30,7 +35,8 @@ export class AddonManager {
 		try {
 			if (typeof addon.onRegister === "function") {
 				await addon.onRegister(this.context);
-				this.addons.push(addon);
+				this.exports[addon.id] = addon.exports();
+				this.addons.set(addon.id, addon);
 			}
 			console.log(`[Addon] Registered: ${addon.name}`);
 		} catch (e) {
@@ -47,7 +53,7 @@ export class AddonManager {
 		try {
 			if (typeof addon.onDestroy === "function") {
 				await addon.onDestroy(this.context);
-				this.addons = this.addons.filter(a => a.id !== addon.id);
+				this.addons.delete(addon.id);
 			}
 			console.log(`[Addon] Removed: ${addon.name}`);
 		} catch (e) {
@@ -65,6 +71,8 @@ export class AddonManager {
 		try {
 			if (typeof addon.onEnable === "function") {
 				await addon.onEnable(this.context);
+				addon.enabled = true;
+				console.log(`[Addon] Enabled: ${addon.name}`);
 			}
 		} catch (e) {
 			console.error(`[Addon] Failed to enable: ${addon.name}`, e);
@@ -80,6 +88,8 @@ export class AddonManager {
 		try {
 			if (typeof addon.onDisable === "function") {
 				await addon.onDisable(this.context);
+				addon.enabled = false;
+				console.log(`[Addon] Disabled: ${addon.name}`);
 			}
 		} catch (e) {
 			console.error(`[Addon] Failed to disable: ${addon.name}`, e);
@@ -91,7 +101,7 @@ export class AddonManager {
 	 * @remarks This method will call the `onEnable` method of each addon
 	 */
 	async enableAll() {
-		for (const addon of this.addons) {
+		for (const addon of this.addons.values()) {
 			await this.enable(addon);
 		}
 	}
@@ -101,7 +111,7 @@ export class AddonManager {
 	 * @remarks This method will call the `onDisable` method of each addon
 	 */
 	async disableAll() {
-		for (const addon of this.addons) {
+		for (const addon of this.addons.values()) {
 			await this.disable(addon);
 		}
 	}
@@ -111,6 +121,6 @@ export class AddonManager {
 	 * @returns An array of addon names
 	 */
 	listAddons(): string[] {
-		return this.addons.map(a => a.name ?? "Unknown Addon");
+		return Array.from(this.addons.values()).map(addon => addon.name);
 	}
 }

@@ -1,11 +1,10 @@
 import "./styles/variables.css"
 import "./styles/main.css"
-import "./styles/start_screen.css"
-import "./styles/canvas.css"
-import "./ui/canvas"
-import "./ui/start"
-import "./ui/toolbar"
-import "./ui/overlay"
-import "./ui/load_image"
+import AddonManager from "./core/manager";
+import { DemoAddon } from "./addons/demo/DemoAddon";
 
-console.log("VanPoint initialized");
+const manager = new AddonManager();
+await manager.register(new DemoAddon());
+await manager.enableAll();
+
+console.log("All addons enabled");
