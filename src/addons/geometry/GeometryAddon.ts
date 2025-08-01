@@ -14,18 +14,18 @@ export class GeometryAddon extends Addon {
 	async onRegister(_: AddonContext) {
 		const geometry = new THREE.BoxGeometry(1, 1, 1);
 		const material = new THREE.MeshPhongMaterial({
-			color: 0x00ffff,
+			color: 0xff0000,
 			flatShading: true,
 			transparent: true,
 			opacity: 0.5
 		});
 		const cube = new THREE.Mesh(geometry, material);
 		
-		const grid = new THREE.GridHelper(10, 10);
-		grid.position.set(-0.5, -0.5, -0.5);
+		const grid = new THREE.GridHelper(9, 9);
+		grid.position.set(0, -0.5, 0);
 
 		const btn = document.createElement("button");
-		btn.textContent = "Toggle Objects";
+		btn.textContent = "▢";
 		btn.addEventListener("click", () => {
 			if (this.hidden) {
 				cube.visible = true;

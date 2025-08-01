@@ -5,17 +5,17 @@ import "./ui/components/interface/interface.ts"
 import "./ui/components/propertyMenu/property.ts"
 import "./ui/components/widgets/widgets.ts"
 import AddonManager from "./core/manager";
-import { DemoAddon } from "./addons/demo/DemoAddon";
 import { ViewportAddon } from "./addons/viewport/ViewportAddon";
 import { loadInitialAddons } from "./ui/components/addonLoaderScreen/loader";
+import { GeometryAddon } from "./addons/geometry/GeometryAddon.ts";
 
 const debug = true;
 
 const addons = {
 	core: [ ViewportAddon ],
-	extended: [],
+	extended: [ GeometryAddon ],
 	custom: [],
-	debug: [ DemoAddon ]
+	debug: []
 };
 
 const manager = new AddonManager(debug);
