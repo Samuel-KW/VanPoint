@@ -7,7 +7,7 @@ export default class AddonManager {
 	private context: AddonContext;
 	private exports: Record<string, any> = {};
 
-	constructor() {
+	constructor(debug = false) {
 		this.context = {
 			viewport: {
 				scene:  new Scene(),
@@ -16,9 +16,12 @@ export default class AddonManager {
 			},
 			ui: {
 				toolbar: document.getElementById("toolbar") as HTMLDivElement,
-				propertyPanel: document.getElementById("properties") as HTMLDivElement,
-				renderArea: document.getElementById("render-area") as HTMLDivElement
+				propertyPanel: document.getElementById("property-panel") as HTMLDivElement,
+				renderArea: document.getElementById("render-area") as HTMLDivElement,
+				widgets: document.getElementById("widgets") as HTMLDivElement,
+				viewport: document.getElementById("viewport") as HTMLDivElement
 			},
+			debug,
 			events: new EventBus(),
 			get exports() {
 				return (id: string) => this._exports[id];
@@ -47,11 +50,12 @@ export default class AddonManager {
 
 	/**
 	 * Remove an addon
-	 * @remarks This method will call the `onDestroy` method of the addon
+	 * @remarks This method will call the `onDisable` and `onDestroy` methods of the addon
 	 * @param addon The addon to remove
 	 */
 	async remove(addon: Addon) {
 		try {
+			await this.disable(addon);
 			if (typeof addon.onDestroy === "function") {
 				await addon.onDestroy(this.context);
 				this.addons.delete(addon.id);

@@ -52,7 +52,7 @@ export class DemoAddon extends Addon {
 	}
 
 	async onDestroy(_: AddonContext) {
-		alert("Sorry to see you go 😢");
+		alert("Sorry to see you go ):");
 	}
 
 	exports() {

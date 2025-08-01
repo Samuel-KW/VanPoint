@@ -23,7 +23,10 @@ export interface AddonContext {
 		toolbar: HTMLElement;
 		propertyPanel: HTMLElement;
 		renderArea: HTMLElement;
+		widgets: HTMLElement;
+		viewport: HTMLElement;
 	};
+	debug: boolean;
 	events: EventBus;
 	exports: <T = any>(id: string) => T;
 	_exports: Record<string, any>; // internal reference for getter function

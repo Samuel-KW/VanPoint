@@ -11,32 +11,51 @@
 
 <body>
 
-	<div id="start-overlay">
+	<div id="start-overlay" style="display: none;">
 		<label id="drop-zone">
 			<p>Drag & Drop or Click to Upload an Image</p>
 			<input type="file" id="file-input" accept="image/*" />
 		</label>
 	</div>
 
-	<div id="canvas-container">
-		<div id="toolbar">
-			<button id="load-image">Load Image</button>
-			<button id="reset-camera">Reset Camera</button>
-			<button id="toggle-grid">Toggle Grid</button>
-			<button id="toggle-axes">Toggle Axes</button>
-			<button id="toggle-helper">Toggle Helper</button>
-			<button id="toggle-image">Toggle Image</button>
-			<button id="toggle-controls">Toggle Controls</button>
-			<button id="toggle-overlay">Toggle Overlay</button>
-			<button id="toggle-cube">Toggle Cube</button>
+	<div class="main-content">
+		
+		<div id="toolbar-panel">
+			<input type="checkbox" id="hamburger-toggle">
+			<label id="hamburger-label" for="hamburger-toggle" tabindex="0">
+				<div class="icon-menu-close"><div></div><div></div><div></div></div>
+			</label>
+			<div id="toolbar">
+				<button id="load-image">Load Image</button>
+				<button id="reset-camera">Reset Camera</button>
+				<button id="toggle-grid">Toggle Grid</button>
+				<button id="toggle-axes">Toggle Axes</button>
+				<button id="toggle-helper">Toggle Helper</button>
+				<button id="toggle-image">Toggle Image</button>
+				<button id="toggle-controls">Toggle Controls</button>
+				<button id="toggle-overlay">Toggle Overlay</button>
+				<button id="toggle-cube">Toggle Cube</button>
+			</div>
 		</div>
-		<div id="properties">
-			<h3>Properties</h3>	
+		
+		<div class="interface">
+			<div id="viewport">
+				<div id="widgets">
+					<button id="axisGizmo">+</button>
+					<button>-</button>
+					<button>-</button>
+					<button>-</button>
+					<button>-</button>
+				</div>
+				<div id="render-area"></div>
+			</div>
+			<div id="property-panel">
+				<div>
+					<h3>Properties</h3>
+				</div>
+			</div>
 		</div>
-		<div id="render-area"></div>
-	</div>	
-
-	
+	</div>
 
 	<script type="module" src="/src/main.ts"></script>
 </body>
