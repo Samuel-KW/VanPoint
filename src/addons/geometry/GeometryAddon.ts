@@ -11,7 +11,7 @@ export class GeometryAddon extends Addon {
 	private properties?: HTMLDivElement;
 	private hidden = false;
 
-	async onRegister(ctx: AddonContext) {
+	async onRegister(_: AddonContext) {
 		const geometry = new THREE.BoxGeometry(1, 1, 1);
 		const material = new THREE.MeshPhongMaterial({
 			color: 0x00ffff,

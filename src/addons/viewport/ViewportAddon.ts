@@ -18,7 +18,7 @@ export class ViewportAddon extends Addon {
 	ambientLight?: THREE.AmbientLight;
 	directionalLight?: THREE.DirectionalLight;
 	
-	ui?: { [key: string]: HTMLElement };
+	resizeObserver?: ResizeObserver;
 	styles: CSSStyleDeclaration = getComputedStyle(document.documentElement);
 	enabled = false;
 	debug = false;
@@ -26,13 +26,21 @@ export class ViewportAddon extends Addon {
 	async onRegister(ctx: AddonContext) {
 		if (ctx.debug) {
 			this.stats = new Stats();
-			this.stats.dom.style = "position:absolute;cursor:pointer;opacity:0.9;top:0;right:0;"
+			this.stats.dom.style = "position:absolute;cursor:pointer;opacity:0.9;top:0;left:5em;"
 			this.debug = true;
 		}
 
-		this.ui = ctx.ui;
-		const width = window.innerWidth - this.ui.propertyPanel.offsetWidth;
-		const height = window.innerHeight - this.ui.toolbar.offsetHeight;
+		this.resizeObserver = new ResizeObserver(entries => {
+			const entry = entries[0];
+			const width = entry.contentRect.width;
+			const height = entry.contentRect.height;
+			ctx.viewport.renderer.setSize(width, height);
+			ctx.viewport.camera.aspect = width / height;
+			ctx.viewport.camera.updateProjectionMatrix();
+		});
+
+		const width = ctx.ui.viewport.offsetWidth;
+		const height = ctx.ui.viewport.offsetHeight;
 
 		this.scene = ctx.viewport.scene;
 		this.scene.background = new THREE.Color(this.styles.getPropertyValue("--bg-color-3"));
@@ -61,7 +69,7 @@ export class ViewportAddon extends Addon {
 	}
 
 	async onEnable(ctx: AddonContext) {
-		if (!this.scene || !this.camera || !this.renderer || !this.controls || !this.helper || !this.ambientLight || !this.directionalLight) {
+		if (!this.scene || !this.camera || !this.renderer || !this.controls || !this.helper || !this.ambientLight || !this.directionalLight || !this.resizeObserver) {
 			return;
 		}
 
@@ -70,20 +78,19 @@ export class ViewportAddon extends Addon {
 			this.debug = true;
 		}
 
-		window.addEventListener("resize", () => this.onResize());
+		this.resizeObserver.observe(ctx.ui.viewport);
 
 		this.scene.add(this.ambientLight);
 		this.scene.add(this.directionalLight);
 
 		ctx.ui.renderArea.appendChild(this.renderer.domElement);
 
-		this.ui = ctx.ui;
 		this.enabled = true;
 		this.animate();
 	}	
 
 	async onDisable(ctx: AddonContext) {
-		if (!this.scene || !this.camera || !this.renderer || !this.ambientLight || !this.directionalLight) {
+		if (!this.scene || !this.camera || !this.renderer || !this.ambientLight || !this.directionalLight || !this.resizeObserver) {
 			return;
 		}
 
@@ -93,23 +100,23 @@ export class ViewportAddon extends Addon {
 			ctx.ui.renderArea.removeChild(this.stats.dom);
 		}
 
-		window.removeEventListener("resize", () => this.onResize());
+		this.resizeObserver.unobserve(ctx.ui.viewport);
 
 		this.scene.remove(this.ambientLight);
 		this.scene.remove(this.directionalLight);
 		
 		ctx.ui.renderArea.removeChild(this.renderer.domElement);
 		this.enabled = false;
-		this.viewport = undefined;
 	}
 
 	async onDestroy(_: AddonContext) {
-		if (!this.scene || !this.camera || !this.renderer || !this.controls || !this.helper || !this.ambientLight || !this.directionalLight) {
+		if (!this.scene || !this.camera || !this.renderer || !this.controls || !this.helper || !this.ambientLight || !this.directionalLight || !this.resizeObserver) {
 			return;
 		}
 		this.enabled = false;
 		alert("Warning: You have removed the core viewport addon. This may cause issues with the application.");
 		
+		this.resizeObserver.disconnect();
 		this.scene.clear();
 		this.renderer.dispose();
 		this.ambientLight.dispose();
@@ -117,6 +124,7 @@ export class ViewportAddon extends Addon {
 		this.controls.dispose();
 		this.helper.dispose();
 
+		this.resizeObserver = undefined;
 		this.scene = undefined;
 		this.camera = undefined;
 		this.renderer = undefined;
@@ -125,22 +133,10 @@ export class ViewportAddon extends Addon {
 		this.stats = undefined;
 		this.ambientLight = undefined;
 		this.directionalLight = undefined;
-		this.ui = undefined;
 	}
 
 	exports() {
 		return {};
-	}
-
-	onResize() {
-		if (!this.camera || !this.renderer || !this.ui) {
-			return
-		}
-		const width = window.innerWidth - this.ui.propertyPanel.offsetWidth;
-		const height = window.innerHeight - this.ui.toolbar.offsetHeight;
-		this.camera.aspect = width / height;
-		this.camera.updateProjectionMatrix()
-		this.renderer.setSize(width, height);
 	}
 
 	animate() {

@@ -16,11 +16,20 @@
 		position: relative;
 		flex-grow: 1;
 		height: 100%;
+
+		#render-area {
+			position: absolute;
+			z-index: 5;
+		}
 	}
 }
 
 @media only screen and (max-width: 600px) {
 	.interface {
 		flex-direction: column;
+
+		#viewport {
+			max-height: 70%;
+		}
 	}
 }

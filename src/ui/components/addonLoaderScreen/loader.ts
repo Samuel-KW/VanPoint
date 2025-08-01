@@ -11,20 +11,12 @@ interface AddonMap {
 
 // Register and enable all addons
 export async function loadInitialAddons(manager: AddonManager, addons: AddonMap, debug = false) {
-	
-	const container = document.createElement("div");
-	const progressHeader = document.createElement("h3");
-	const progressDetails = document.createElement("h4")
-	const progressBar = document.createElement("progress");
-
-	container.classList.add("load-container");
-	container.appendChild(progressHeader);
-	container.appendChild(progressDetails);
-	container.appendChild(progressBar);
-	document.body.appendChild(container);
+	const container = document.getElementById("load-container") as HTMLDivElement;
+	const progressHeader = document.getElementById("load-header") as HTMLHeadingElement;
+	const progressDetails = document.getElementById("load-details") as HTMLHeadingElement;
+	const progressBar = document.getElementById("load-progress") as HTMLProgressElement;
 	
 	// Each addon has register and enable operations
-	progressBar.value = 0;
 	progressBar.max = Object.values(addons)
 		.reduce((sum, array) => sum + array.length, 0) * 2; 
 

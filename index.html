@@ -11,6 +11,12 @@
 
 <body>
 
+	<div id="load-container">
+		<h3 id="load-header"></h3>
+		<h4 id="load-details"></h4>
+		<progress id="load-progress" value="0"></progress>
+	</div>
+
 	<div id="start-overlay" style="display: none;">
 		<label id="drop-zone">
 			<p>Drag & Drop or Click to Upload an Image</p>
@@ -40,13 +46,7 @@
 		
 		<div class="interface">
 			<div id="viewport">
-				<div id="widgets">
-					<button id="axisGizmo">+</button>
-					<button>-</button>
-					<button>-</button>
-					<button>-</button>
-					<button>-</button>
-				</div>
+				<div id="widgets"></div>
 				<div id="render-area"></div>
 			</div>
 			<div id="property-panel">
