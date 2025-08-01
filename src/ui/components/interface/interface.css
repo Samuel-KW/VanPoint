@@ -12,6 +12,7 @@
 	overflow: hidden;
 
 	#viewport {
+		background-color: var(--bg-color-3);
 		display: inline-block;
 		position: relative;
 		flex-grow: 1;
