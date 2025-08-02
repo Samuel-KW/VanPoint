@@ -81,11 +81,10 @@ export class PreviewAddon extends Addon {
 					return;
 				}
 
-				const aspect = image.width / image.height;
 				this.material.map = texture;
 				this.material.needsUpdate = true;
 		
-				this.updateOverlay(ctx, aspect);
+				this.updateOverlay(ctx);
 			});
 		});
 
@@ -128,19 +127,19 @@ export class PreviewAddon extends Addon {
 		return { demoStatus: this.enabled };
 	}
 
-	updateOverlay(ctx: AddonContext, aspect: number) {
+	updateOverlay(ctx: AddonContext) {
 		if (!this.geometry || !this.material || !this.mesh) {
 			return;
 		}
 
 		const camera = ctx.viewport.camera;
 
-		const viewAspect = ctx.ui.viewport.offsetWidth / ctx.ui.viewport.offsetHeight;
-		const isContainFit = aspect <= viewAspect;
-	
 		const img = this.material.map!.image as HTMLImageElement;
 		const width = img.naturalWidth;
 		const height = img.naturalHeight;
+
+		const viewAspect = ctx.ui.viewport.offsetWidth / ctx.ui.viewport.offsetHeight;
+		const isContainFit = width / height <= viewAspect;
 	
 		const distance = isContainFit
 			? height / (2 * tanHalfFov(camera.fov))
@@ -153,8 +152,6 @@ export class PreviewAddon extends Addon {
 		camera.getWorldDirection(camDir);
 		this.mesh.position.copy(camera.position).add(camDir.multiplyScalar(distance));
 	
-		// Align plane to face the same direction as camera
 		this.mesh.quaternion.copy(camera.quaternion);
-
 	}
 }
