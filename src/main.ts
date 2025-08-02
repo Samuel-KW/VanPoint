@@ -10,6 +10,7 @@ import { loadInitialAddons } from "./ui/components/addonLoaderScreen/loader";
 import { GeometryAddon } from "./addons/geometry/GeometryAddon.ts";
 import { PreviewAddon } from "./addons/preview/PreviewAddon.ts";
 import { DebugBordersAddon } from "./addons/debugBorders/BordersAddon.ts";
+import { DirectionSphereAddon } from "./addons/directionSphere/DirectionSphereAddon.ts";
 
 const debug = true;
 
@@ -17,7 +18,7 @@ const addons = {
 	core: [ ViewportAddon, GeometryAddon, PreviewAddon ],
 	extended: [ ],
 	custom: [],
-	debug: [ DebugBordersAddon ]
+	debug: [ DebugBordersAddon, DirectionSphereAddon ]
 };
 
 const manager = new AddonManager(debug);
