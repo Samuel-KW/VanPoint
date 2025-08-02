@@ -22,10 +22,10 @@ const colors = [
 	"#adff2f" 
 ];
 
-
 export class DebugBordersAddon extends Addon {
 	id = "debugBorders";
-	name = "Debug UI element borders";
+	name = "Debug Borders";
+	description = "Debug UI element borders";
 
 	private hidden = false;
 

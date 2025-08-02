@@ -12,7 +12,7 @@ export default class AddonManager {
 			viewport: {
 				scene:  new Scene(),
 				camera: new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000),
-				renderer: new WebGLRenderer({ antialias: true })
+				renderer: new WebGLRenderer({ antialias: true, alpha: true })
 			},
 			ui: {
 				toolbar: document.getElementById("toolbar") as HTMLDivElement,
@@ -52,7 +52,9 @@ export default class AddonManager {
 	 * @remarks This method will call the `onDisable` and `onDestroy` methods of the addon
 	 * @param addon The addon to remove
 	 */
-	async remove(addon: Addon) {
+	async remove(ref: Addon | string) {
+		let addon = typeof ref === "string" ? this.addons.get(ref)! : ref;
+
 		try {
 			await this.disable(addon);
 			if (typeof addon.onDestroy === "function") {
@@ -70,12 +72,15 @@ export default class AddonManager {
 	 * @remarks This method will call the `onEnable` method of the addon
 	 * @param addon The addon to enable
 	 */
-	async enable(addon: Addon) {
+	async enable(ref: Addon | string) {
+		let addon = typeof ref === "string" ? this.addons.get(ref)! : ref;
+
 		if (!this.addons.has(addon.id)) {
 			console.warn(`[Addon] Cannot enable: ${addon.name} is not registered`);
 			return;
 		}
 		if (addon.enabled) {
+			console.warn(`[Addon] Cannot enable: ${addon.name} is already enabled`);
 			return;
 		}
 
@@ -95,12 +100,15 @@ export default class AddonManager {
 	 * @remarks This method will call the `onDisable` method of the addon
 	 * @param addon The addon to disable
 	 */
-	async disable(addon: Addon) {
+	async disable(ref: Addon | string) {
+		let addon = typeof ref === "string" ? this.addons.get(ref)! : ref;
+
 		if (!this.addons.has(addon.id)) {
 			console.warn(`[Addon] Cannot disable: ${addon.name} is not registered`);
 			return;
 		}
 		if (!addon.enabled) {
+			console.warn(`[Addon] Cannot disable: ${addon.name} is not enabled`);
 			return;
 		}
 		

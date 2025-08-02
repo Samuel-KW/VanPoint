@@ -44,7 +44,6 @@ export class ViewportAddon extends Addon {
 		const height = ctx.ui.viewport.offsetHeight;
 
 		this.scene = ctx.viewport.scene;
-		this.scene.background = new THREE.Color(this.styles.getPropertyValue("--bg-color-3"));
 
 		this.renderer = ctx.viewport.renderer;
 		this.renderer.setPixelRatio(window.devicePixelRatio);
@@ -148,6 +147,11 @@ export class ViewportAddon extends Addon {
 		if (!this.scene || !this.camera || !this.renderer || !this.helper || !this.controls) {
 			return;
 		}
+
+		this.camera.position.x += 0.01;
+		this.camera.position.y += 0.01;
+		this.camera.lookAt(0, 0, 0);
+
 		this.renderer.clear();
 		this.controls.update();
 		this.renderer.render(this.scene, this.camera);

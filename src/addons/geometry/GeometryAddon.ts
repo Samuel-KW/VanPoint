@@ -32,16 +32,16 @@ export class GeometryAddon extends Addon {
 		btn.innerHTML = svgShown;
 		
 		btn.addEventListener("click", () => {
+			this.hidden = !this.hidden;
 			if (this.hidden) {
-				cube.visible = true;
-				grid.visible = true;
-				btn.innerHTML = svgShown;
-			} else {
 				cube.visible = false;
 				grid.visible = false;
 				btn.innerHTML = svgHidden;
+			} else {
+				cube.visible = true;
+				grid.visible = true;
+				btn.innerHTML = svgShown;
 			}
-			this.hidden = !this.hidden;
 		});
 
 		const properties = document.createElement("div");

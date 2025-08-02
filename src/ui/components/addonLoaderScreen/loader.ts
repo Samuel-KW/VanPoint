@@ -9,8 +9,14 @@ interface AddonMap {
 	[id: string]: (new () => Addon)[];
 }
 
+interface AddonInstanceMap {
+	[id: string]: Addon[];
+}
+
 // Register and enable all addons
 export async function loadInitialAddons(manager: AddonManager, addons: AddonMap, debug = false) {
+	const instanceMap: AddonInstanceMap = {};
+	
 	const container = document.getElementById("load-container") as HTMLDivElement;
 	const progressHeader = document.getElementById("load-header") as HTMLHeadingElement;
 	const progressDetails = document.getElementById("load-details") as HTMLHeadingElement;
@@ -24,6 +30,7 @@ export async function loadInitialAddons(manager: AddonManager, addons: AddonMap,
 
 	for (const [category, addonArray] of Object.entries(addons)) {
 		
+		instanceMap[category] = [];
 		if (category === "debug" && !debug) {
 			continue; // Skip debug addons if not in debug mode
 		}
@@ -33,15 +40,17 @@ export async function loadInitialAddons(manager: AddonManager, addons: AddonMap,
 		for (const addonClass of addonArray) {
 			const addon = new addonClass();
 
-			progressDetails.textContent = `[1/2] Enabling ${addon.name}`;
+			progressDetails.textContent = `[1/2] Enabling ${addonClass.name}`;
 			await manager.register(addon);
 			progressBar.value += 1;
 			if (debug && debugDelay) await sleep(debugDelay);
 
-			progressDetails.textContent = `[2/2] Enabling ${addon.name}`;
+			progressDetails.textContent = `[2/2] Enabling ${addonClass.name}`;
 			await manager.enable(addon);
 			progressBar.value += 1;
 			if (debug && debugDelay) await sleep(debugDelay);
+
+			instanceMap[category].push(addon);
 		}
 	}
 
@@ -49,8 +58,8 @@ export async function loadInitialAddons(manager: AddonManager, addons: AddonMap,
 	progressDetails.textContent = `Took ${Math.round((Date.now() - start) / 10) / 100}s`;
 	progressBar.value = progressBar.max;
 
-	container.style.animation = "fade-out 1s ease-in-out forwards 1s";
-	await sleep(3000);
+	container.style.animation = "fade-out 1s ease-in-out forwards 0.5s";
+	setTimeout(() => container.remove(), 3000);
 
-	container.remove();
+	return instanceMap;
 }
