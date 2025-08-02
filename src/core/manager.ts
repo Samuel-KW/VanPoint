@@ -17,7 +17,6 @@ export default class AddonManager {
 			ui: {
 				toolbar: document.getElementById("toolbar") as HTMLDivElement,
 				propertyPanel: document.getElementById("property-panel") as HTMLDivElement,
-				renderArea: document.getElementById("render-area") as HTMLDivElement,
 				widgets: document.getElementById("widgets") as HTMLDivElement,
 				viewport: document.getElementById("viewport") as HTMLDivElement
 			},

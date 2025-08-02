@@ -23,7 +23,6 @@ export interface AddonContext {
 	ui: {
 		toolbar: HTMLElement;
 		propertyPanel: HTMLElement;
-		renderArea: HTMLElement;
 		widgets: HTMLElement;
 		viewport: HTMLElement;
 	};

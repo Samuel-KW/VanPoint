@@ -27,7 +27,7 @@ export class ViewportAddon extends Addon {
 	async onRegister(ctx: AddonContext) {
 		if (ctx.debug) {
 			this.stats = new Stats();
-			this.stats.dom.style = "position:absolute;cursor:pointer;opacity:0.9;top:0;left:5em;"
+			this.stats.dom.style = "position:absolute;cursor:pointer;opacity:0.9;top:0;left:5em;z-index:7;";
 			this.debug = true;
 		}
 
@@ -75,7 +75,7 @@ export class ViewportAddon extends Addon {
 		}
 
 		if (ctx.debug && this.stats) {
-			ctx.ui.renderArea.appendChild(this.stats.dom);
+			ctx.ui.viewport.appendChild(this.stats.dom);
 			this.debug = true;
 		}
 
@@ -84,7 +84,7 @@ export class ViewportAddon extends Addon {
 		this.scene.add(this.ambientLight);
 		this.scene.add(this.directionalLight);
 
-		ctx.ui.renderArea.appendChild(this.renderer.domElement);
+		ctx.ui.viewport.appendChild(this.renderer.domElement);
 
 		this.enabled = true;
 		this.animate();
@@ -98,7 +98,7 @@ export class ViewportAddon extends Addon {
 		alert("Warning: You have disabled the core viewport addon. This may cause issues with the application.");
 	
 		if (ctx.debug && this.stats) {
-			ctx.ui.renderArea.removeChild(this.stats.dom);
+			ctx.ui.viewport.removeChild(this.stats.dom);
 		}
 
 		this.resizeObserver.unobserve(ctx.ui.viewport);
@@ -106,7 +106,7 @@ export class ViewportAddon extends Addon {
 		this.scene.remove(this.ambientLight);
 		this.scene.remove(this.directionalLight);
 		
-		ctx.ui.renderArea.removeChild(this.renderer.domElement);
+		ctx.ui.viewport.removeChild(this.renderer.domElement);
 		this.enabled = false;
 	}
 

@@ -34,7 +34,7 @@ export const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.autoClear = false;
-document.getElementById("render-area")!.appendChild(renderer.domElement);
+document.getElementById("viewport")!.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableRotate = false;

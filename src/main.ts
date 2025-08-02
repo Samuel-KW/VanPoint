@@ -9,14 +9,15 @@ import { ViewportAddon } from "./addons/viewport/ViewportAddon";
 import { loadInitialAddons } from "./ui/components/addonLoaderScreen/loader";
 import { GeometryAddon } from "./addons/geometry/GeometryAddon.ts";
 import { PreviewAddon } from "./addons/preview/PreviewAddon.ts";
+import { DebugBordersAddon } from "./addons/debugBorders/borders.ts";
 
-const debug = true;
+const debug = false;
 
 const addons = {
 	core: [ ViewportAddon, GeometryAddon, PreviewAddon ],
 	extended: [ ],
 	custom: [],
-	debug: []
+	debug: [ DebugBordersAddon ]
 };
 
 const manager = new AddonManager(debug);
