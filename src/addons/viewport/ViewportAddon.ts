@@ -9,20 +9,26 @@ export class ViewportAddon extends Addon {
 	name = "Core viewport addon";
 	description = "Adds the 3D viewport";
 
-	scene?: THREE.Scene;
-	camera?: THREE.PerspectiveCamera;
-	renderer?: THREE.WebGLRenderer;
-	controls?: OrbitControls;
-	helper?: ViewHelper;
-	stats?: Stats;
+	private scene?: THREE.Scene;
+	private camera?: THREE.PerspectiveCamera;
+	private renderer?: THREE.WebGLRenderer;
+	private controls?: OrbitControls;
+	private helper?: ViewHelper;
+	private stats?: Stats;
 
-	ambientLight?: THREE.AmbientLight;
-	directionalLight?: THREE.DirectionalLight;
+	private ambientLight?: THREE.AmbientLight;
+	private directionalLight?: THREE.DirectionalLight;
 	
-	resizeObserver?: ResizeObserver;
-	styles: CSSStyleDeclaration = getComputedStyle(document.documentElement);
-	enabled = false;
-	debug = false;
+	private offset = { x: 0, y: 0 };
+	private position = { x: 0, y: 0 };
+	private initialPos = { x: 0, y: 0 };
+	private dragging = false;
+	private dragEndListener?: (event: MouseEvent | TouchEvent) => void;
+	private dragStartListener?: (event: MouseEvent | TouchEvent) => void;
+	private dragListener?: (event: MouseEvent | TouchEvent) => void;
+	private imageLoadListener?: (image: HTMLImageElement) => void;
+	
+	private debug = false;
 
 	async onRegister(ctx: AddonContext) {
 		if (ctx.debug) {
@@ -30,15 +36,6 @@ export class ViewportAddon extends Addon {
 			this.stats.dom.style = "position:absolute;cursor:pointer;opacity:0.9;top:0;left:5em;z-index:7;";
 			this.debug = true;
 		}
-
-		this.resizeObserver = new ResizeObserver(entries => {
-			const entry = entries[0];
-			const width = entry.contentRect.width;
-			const height = entry.contentRect.height;
-			ctx.viewport.renderer.setSize(width, height);
-			ctx.viewport.camera.aspect = width / height;
-			ctx.viewport.camera.updateProjectionMatrix();
-		});
 
 		const width = ctx.ui.viewport.offsetWidth;
 		const height = ctx.ui.viewport.offsetHeight;
@@ -69,7 +66,7 @@ export class ViewportAddon extends Addon {
 	}
 
 	async onEnable(ctx: AddonContext) {
-		if (!this.scene || !this.camera || !this.renderer || !this.controls || !this.helper || !this.ambientLight || !this.directionalLight || !this.resizeObserver) {
+		if (!this.scene || !this.camera || !this.renderer || !this.controls || !this.helper || !this.ambientLight || !this.directionalLight) {
 			return;
 		}
 
@@ -78,19 +75,45 @@ export class ViewportAddon extends Addon {
 			this.debug = true;
 		}
 
-		this.resizeObserver.observe(ctx.ui.viewport);
+		this.dragStartListener = (event: MouseEvent | TouchEvent) => this.dragStart(event, ctx);
+		window.addEventListener("mousedown", this.dragStartListener);
+		window.addEventListener("touchstart", this.dragStartListener);
+		
+		this.dragEndListener = () => this.dragEnd();
+		window.addEventListener("mouseup", this.dragEndListener);
+		window.addEventListener("touchend", this.dragEndListener);
+		
+		this.dragListener = (event: MouseEvent | TouchEvent) => this.drag(event, ctx);
+		window.addEventListener("mousemove", this.dragListener);
+		window.addEventListener("touchmove", this.dragListener);
+
+		this.imageLoadListener = (image: HTMLImageElement) => {
+			const availWidth = ctx.ui.viewport.offsetWidth;
+			const availHeight = ctx.ui.viewport.offsetHeight;
+
+			const imgWidth = image.naturalWidth;
+			const imgHeight = image.naturalHeight;
+
+			const scale = Math.min(availWidth / imgWidth, availHeight / imgHeight);
+			const width = imgWidth * scale;
+			const height = imgHeight * scale;
+
+			ctx.viewport.renderer.setSize(width, height);
+			ctx.viewport.camera.aspect = width / height;
+			ctx.viewport.camera.updateProjectionMatrix();
+		}
+		ctx.events.on("image:loaded", this.imageLoadListener);
 
 		this.scene.add(this.ambientLight);
 		this.scene.add(this.directionalLight);
 
 		ctx.ui.viewport.appendChild(this.renderer.domElement);
 
-		this.enabled = true;
 		this.animate();
 	}	
 
 	async onDisable(ctx: AddonContext) {
-		if (!this.scene || !this.camera || !this.renderer || !this.ambientLight || !this.directionalLight || !this.resizeObserver) {
+		if (!this.scene || !this.camera || !this.renderer || !this.ambientLight || !this.directionalLight || !this.dragEndListener || !this.dragStartListener || !this.dragListener || !this.imageLoadListener) {
 			return;
 		}
 
@@ -100,23 +123,23 @@ export class ViewportAddon extends Addon {
 			ctx.ui.viewport.removeChild(this.stats.dom);
 		}
 
-		this.resizeObserver.unobserve(ctx.ui.viewport);
+		window.removeEventListener("mouseup", this.dragEndListener);
+		window.removeEventListener("mousedown", this.dragStartListener);
+		window.removeEventListener("mousemove", this.dragListener);
+		ctx.events.off("image:loaded", this.imageLoadListener);
 
 		this.scene.remove(this.ambientLight);
 		this.scene.remove(this.directionalLight);
 		
 		ctx.ui.viewport.removeChild(this.renderer.domElement);
-		this.enabled = false;
 	}
 
 	async onDestroy(_: AddonContext) {
-		if (!this.scene || !this.camera || !this.renderer || !this.controls || !this.helper || !this.ambientLight || !this.directionalLight || !this.resizeObserver) {
+		if (!this.scene || !this.camera || !this.renderer || !this.controls || !this.helper || !this.ambientLight || !this.directionalLight) {
 			return;
 		}
-		this.enabled = false;
 		console.warn("Warning: You have removed the core viewport addon. This may cause issues with the application.");
 		
-		this.resizeObserver.disconnect();
 		this.scene.clear();
 		this.renderer.dispose();
 		this.ambientLight.dispose();
@@ -124,7 +147,6 @@ export class ViewportAddon extends Addon {
 		this.controls.dispose();
 		this.helper.dispose();
 
-		this.resizeObserver = undefined;
 		this.scene = undefined;
 		this.camera = undefined;
 		this.renderer = undefined;
@@ -160,5 +182,64 @@ export class ViewportAddon extends Addon {
 		if (this.debug && this.stats) {
 			this.stats.update();
 		}
+	}
+
+	dragStart(event: MouseEvent | TouchEvent, ctx: AddonContext) {
+		if (!this.enabled) {
+			return;
+		}
+
+		let posX, posY;
+
+		if (event instanceof TouchEvent) {
+			posX = event.touches[0].clientX;
+			posY = event.touches[0].clientY;
+		} else {
+			posX = event.clientX;
+			posY = event.clientY;
+		}
+
+		this.initialPos.x = posX - this.offset.x;
+		this.initialPos.y = posY - this.offset.y;
+
+		this.dragging = true;
+		
+		this.drag(event, ctx);
+	}
+
+	dragEnd() {
+		if (!this.enabled) {
+			return;
+		}
+		this.initialPos.x = this.position.x;
+		this.initialPos.y = this.position.y;
+		this.dragging = false;
+	}
+
+	drag(event: MouseEvent | TouchEvent, ctx: AddonContext) {
+		if (!this.enabled || !this.renderer || !this.dragging) {
+			return;
+		}
+		
+		let currentX, currentY;
+		if (event instanceof TouchEvent) {
+			currentX = event.touches[0].clientX;
+			currentY = event.touches[0].clientY;
+		} else {
+			currentX = event.clientX;
+			currentY = event.clientY;
+		}
+		currentX -= this.initialPos.x;
+		currentY -= this.initialPos.y;
+
+		this.offset.x = currentX;
+		this.offset.y = currentY;
+
+		this.position.x = currentX;
+		this.position.y = currentY;
+
+		const parent = ctx.viewport.renderer.domElement;
+		parent.style.left = `${this.position.x}px`;
+		parent.style.top = `${this.position.y}px`;
 	}
 }
