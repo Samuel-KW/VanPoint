@@ -76,8 +76,8 @@ export class ViewportAddon extends Addon {
 		}
 
 		this.dragStartListener = (event: MouseEvent | TouchEvent) => this.dragStart(event, ctx);
-		window.addEventListener("mousedown", this.dragStartListener);
-		window.addEventListener("touchstart", this.dragStartListener);
+		ctx.ui.viewport.addEventListener("mousedown", this.dragStartListener);
+		ctx.ui.viewport.addEventListener("touchstart", this.dragStartListener);
 		
 		this.dragEndListener = () => this.dragEnd();
 		window.addEventListener("mouseup", this.dragEndListener);
@@ -123,9 +123,12 @@ export class ViewportAddon extends Addon {
 			ctx.ui.viewport.removeChild(this.stats.dom);
 		}
 
+		ctx.ui.viewport.removeEventListener("mousedown", this.dragStartListener);
+		ctx.ui.viewport.removeEventListener("touchstart", this.dragStartListener);
 		window.removeEventListener("mouseup", this.dragEndListener);
-		window.removeEventListener("mousedown", this.dragStartListener);
+		window.removeEventListener("touchend", this.dragEndListener);
 		window.removeEventListener("mousemove", this.dragListener);
+		window.removeEventListener("touchmove", this.dragListener);
 		ctx.events.off("image:loaded", this.imageLoadListener);
 
 		this.scene.remove(this.ambientLight);
@@ -155,6 +158,11 @@ export class ViewportAddon extends Addon {
 		this.stats = undefined;
 		this.ambientLight = undefined;
 		this.directionalLight = undefined;
+
+		this.dragStartListener = undefined;
+		this.dragEndListener = undefined;
+		this.dragListener = undefined;
+		this.imageLoadListener = undefined;
 	}
 
 	exports() {
