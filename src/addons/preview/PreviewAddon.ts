@@ -18,12 +18,7 @@ export class PreviewAddon extends Addon {
 		
 		btn.addEventListener("click", () => {
 			this.hidden = !this.hidden;
-			if (this.hidden) {
-				btn.innerHTML = "X";
-			} else {
-				btn.innerHTML = "🔎";
-			}
-			ctx.viewport.renderer.domElement.style.background = this.bgStyle;
+			this.updateBackground(ctx, this.hidden);
 		});
 
 		const properties = document.createElement("div");
@@ -35,6 +30,7 @@ export class PreviewAddon extends Addon {
 
 	async onEnable(ctx: AddonContext) {
 		if (!this.button || !this.properties) {
+			console.warn("Button or properties not found");
 			return;
 		}
 
@@ -43,10 +39,12 @@ export class PreviewAddon extends Addon {
 
 		ctx.events.on("image:loaded", (image: HTMLImageElement) => {
 			this.imgSrc = image.src;
-			ctx.viewport.renderer.domElement.style.background = this.bgStyle;
+			this.updateBackground(ctx, false);
 		});
 
-		if (ctx.debug) {
+		if (this.imgSrc) {
+			this.updateBackground(ctx, false);
+		} else if (ctx.debug) {
 			const img = new Image();
 			img.onload = () => {
 				ctx.events.emit("image:loaded", img);
@@ -60,9 +58,9 @@ export class PreviewAddon extends Addon {
 			return;
 		}
 
-		ctx.viewport.renderer.domElement.style.background = `var(--bg-color-3)`;
 		ctx.ui.widgets.removeChild(this.button);
 		ctx.ui.propertyPanel.removeChild(this.properties);
+		this.updateBackground(ctx, true);
 	}
 
 	async onDestroy(_: AddonContext) {
@@ -79,10 +77,24 @@ export class PreviewAddon extends Addon {
 		return { demoStatus: this.enabled };
 	}
 
-	get bgStyle () {
-		if (this.hidden || !this.imgSrc) {
-			return `var(--bg-color-3)`;
+	updateBackground (ctx: AddonContext, hidden: boolean) {
+		if (!this.button) {
+			return;
 		}
-		return `var(--bg-color-3) url(${this.imgSrc}) no-repeat center center / contain`;
+
+		if (hidden) {
+			this.button.innerHTML = "X";
+		} else {
+			this.button.innerHTML = "🔎";
+		}
+
+		const elem = ctx.viewport.renderer.domElement;
+		if (hidden || !this.imgSrc) {
+			elem.style.background = "";
+		} else {
+			elem.style.background = `var(--bg-color-3) url(${this.imgSrc}) no-repeat center center / contain`;
+		}
+
+		this.hidden = hidden;
 	}
 }
