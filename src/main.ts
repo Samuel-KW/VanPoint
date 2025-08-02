@@ -1,4 +1,4 @@
-import "./styles/variables.css"
+import "./styles/variables.dark.forest.css"
 import "./styles/global.css"
 import "./ui/components/toolbar/toolbar.ts"
 import "./ui/components/interface/interface.ts"
@@ -9,7 +9,7 @@ import { ViewportAddon } from "./addons/viewport/ViewportAddon";
 import { loadInitialAddons } from "./ui/components/addonLoaderScreen/loader";
 import { GeometryAddon } from "./addons/geometry/GeometryAddon.ts";
 
-const debug = true;
+const debug = false;
 
 const addons = {
 	core: [ ViewportAddon ],

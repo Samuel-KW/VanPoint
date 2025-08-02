@@ -25,3 +25,15 @@ html, body {
 	width: 100vw;
 	height: 100vh;
 }
+
+button, input {
+	color: var(--text-color-2);
+}
+
+p {
+	color: var(--text-color-3);
+}
+
+h1, h2, h3, h4, h5, h6 {
+	color: var(--text-color-1);
+}

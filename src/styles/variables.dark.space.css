@@ -1,3 +1,7 @@
+/**
+ * https://coolors.co/f7f7f7-222222-e9806e-6afdef-8a37fd
+ */
+
 :root {
 	--primary-0: #f5e9ff;
 	--primary-1: #e4cfff;
@@ -21,6 +25,17 @@
 	--secondary-8: #00c7b5;
 	--secondary-9: #00ad9c;
 
+	--accent-0: #ffede8;
+	--accent-1: #fddad4;
+	--accent-2: #f3b3a8;
+	--accent-3: #e9806e;
+	--accent-4: #e46651;
+	--accent-5: #e05037;
+	--accent-6: #df442a;
+	--accent-7: #c6351d;
+	--accent-8: #b12d18;
+	--accent-9: #9b2311;
+
 	--bg-color-0: #545454;
 	--bg-color-1: #4A4A4A;
 	--bg-color-2: #404040;
@@ -38,4 +53,9 @@
 	--text-color-6: #ACACACff;
 
 	--shadow-color: #000000;
+}
+
+#widgets svg {
+	-webkit-filter: invert(100%);
+            filter: invert(100%);
 }

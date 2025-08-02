@@ -1,0 +1,61 @@
+/**
+ * https://coolors.co/f7f7f7-222222-667761-917c78-1d324a
+ */
+
+:root {
+	--primary-0: #f0f5f9;
+	--primary-1: #e1e6ec;
+	--primary-2: #becbdb;
+	--primary-3: #98afca;
+	--primary-4: #7897bc;
+	--primary-5: #6487b4;
+	--primary-6: #5980b1;
+	--primary-7: #496e9c;
+	--primary-8: #3f628c;
+	--primary-9: #1d324a;
+
+	--secondary-0: #f0f8ee;
+	--secondary-1: #e5eae3;
+	--secondary-2: #cbd2c8;
+	--secondary-3: #aeb9ab;
+	--secondary-4: #96a492;
+	--secondary-5: #869781;
+	--secondary-6: #7e9078;
+	--secondary-7: #667761;
+	--secondary-8: #5e6f59;
+	--secondary-9: #4e6149;
+
+	--accent-0: #fff1ee;
+	--accent-1: #eee4e3;
+	--accent-2: #d4c9c7;
+	--accent-3: #baacaa;
+	--accent-4: #a39491;
+	--accent-5: #968480;
+	--accent-6: #917c78;
+	--accent-7: #7e6965;
+	--accent-8: #725d58;
+	--accent-9: #674e49;
+
+	--bg-color-0: #545454;
+	--bg-color-1: #4A4A4A;
+	--bg-color-2: #404040;
+	--bg-color-3: #363636;
+	--bg-color-4: #2C2C2C;
+	--bg-color-5: #222222;
+	--bg-color-6: #181818;
+
+	--text-color-0: #FCFCFCff;
+	--text-color-1: #EFEFEFff;
+	--text-color-2: #E1E1E1ff;
+	--text-color-3: #D4D4D4ff;
+	--text-color-4: #C7C7C7ff;
+	--text-color-5: #B9B9B9ff;
+	--text-color-6: #ACACACff;
+
+	--shadow-color: #000000;
+}
+
+#widgets svg {
+	-webkit-filter: invert(100%);
+            filter: invert(100%);
+}
