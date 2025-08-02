@@ -4,6 +4,7 @@ import type { EventBus } from "../core/events";
 export class Addon {
 	id: string = "";
 	name: string = "Unnamed Addon";
+	description: string = "No description";
 	enabled: boolean = false;
 
 	onRegister(_: AddonContext): Promise<void> | void { throw new Error("onRegister() method not implemented"); }

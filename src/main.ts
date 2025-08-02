@@ -8,12 +8,13 @@ import AddonManager from "./core/manager";
 import { ViewportAddon } from "./addons/viewport/ViewportAddon";
 import { loadInitialAddons } from "./ui/components/addonLoaderScreen/loader";
 import { GeometryAddon } from "./addons/geometry/GeometryAddon.ts";
+import { PreviewAddon } from "./addons/preview/PreviewAddon.ts";
 
 const debug = false;
 
 const addons = {
-	core: [ ViewportAddon ],
-	extended: [ GeometryAddon ],
+	core: [ ViewportAddon, GeometryAddon, PreviewAddon ],
+	extended: [ ],
 	custom: [],
 	debug: []
 };

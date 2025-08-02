@@ -7,6 +7,7 @@ import Stats from "three/examples/jsm/libs/stats.module.js";
 export class ViewportAddon extends Addon {
 	id = "viewport";
 	name = "Core viewport addon";
+	description = "Adds the 3D viewport";
 
 	scene?: THREE.Scene;
 	camera?: THREE.PerspectiveCamera;
