@@ -99,6 +99,6 @@ export class GeometryAddon extends Addon {
 	}
 
 	exports() {
-		return { demoStatus: this.enabled };
+		return {};
 	}
 }

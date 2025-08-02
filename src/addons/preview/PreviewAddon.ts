@@ -74,7 +74,7 @@ export class PreviewAddon extends Addon {
 	}
 
 	exports() {
-		return { demoStatus: this.enabled };
+		return {};
 	}
 
 	updateBackground (ctx: AddonContext, hidden: boolean) {

@@ -86,8 +86,8 @@ export default class AddonManager {
 
 		try {
 			if (typeof addon.onEnable === "function") {
-				await addon.onEnable(this.context);
 				addon.enabled = true;
+				await addon.onEnable(this.context);
 				console.log(`[Addon] Enabled: ${addon.name}`);
 			}
 		} catch (e) {
@@ -114,8 +114,8 @@ export default class AddonManager {
 		
 		try {
 			if (typeof addon.onDisable === "function") {
-				await addon.onDisable(this.context);
 				addon.enabled = false;
+				await addon.onDisable(this.context);
 				console.log(`[Addon] Disabled: ${addon.name}`);
 			}
 		} catch (e) {
