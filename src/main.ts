@@ -14,10 +14,10 @@ import { DebugBordersAddon } from "./addons/debugBorders/BordersAddon.ts";
 const debug = true;
 
 const addons = {
-	core: [ ViewportAddon, GeometryAddon ],
+	core: [ ViewportAddon, GeometryAddon, PreviewAddon ],
 	extended: [ ],
 	custom: [],
-	debug: [ DebugBordersAddon, PreviewAddon ]
+	debug: [ DebugBordersAddon ]
 };
 
 const manager = new AddonManager(debug);
