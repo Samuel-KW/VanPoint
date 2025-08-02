@@ -3,6 +3,9 @@ import { Addon, type AddonContext } from "../Addon";
 
 const tanHalfFov = (fov: number) => Math.tan((fov * Math.PI) / 360);
 
+const hfovFromVfov = (vfovDeg: number, aspect: number) =>
+	2 * Math.atan(Math.tan((vfovDeg * Math.PI) / 360) * aspect);
+
 export class PreviewAddon extends Addon {
 	id = "previewImage";
 	name = "Image Preview";
@@ -18,7 +21,7 @@ export class PreviewAddon extends Addon {
 	private hidden = false;
 
 	async onRegister(_: AddonContext) {
-		const geometry = new THREE.PlaneGeometry(1, 1); // Placeholder, resized later
+		const geometry = new THREE.PlaneGeometry(0, 0);
 		const material = new THREE.MeshBasicMaterial({
 			color: 0xffffff,
 			transparent: true,
@@ -62,6 +65,37 @@ export class PreviewAddon extends Addon {
 		ctx.viewport.scene.add(this.mesh);
 		ctx.ui.widgets.appendChild(this.button);
 		ctx.ui.propertyPanel.appendChild(this.properties);
+
+		ctx.events.on("image:loaded", (image: HTMLImageElement) => {
+			if (!this.geometry || !this.material || !this.mesh) {
+				return;
+			}
+
+			if (this.mesh.material.map) {
+				this.mesh.material.map.dispose();
+			}
+		
+			const loader = new THREE.TextureLoader();
+			loader.load(image.src, texture => {
+				if (!this.material) {
+					return;
+				}
+
+				const aspect = image.width / image.height;
+				this.material.map = texture;
+				this.material.needsUpdate = true;
+		
+				this.updateOverlay(ctx, aspect);
+			});
+		});
+
+		if (ctx.debug) {
+			const img = new Image();
+			img.onload = () => {
+				ctx.events.emit("image:loaded", img);
+			};
+			img.src = "assets/subway.avif";
+		}
 	}
 
 	async onDisable(ctx: AddonContext) {
@@ -94,55 +128,33 @@ export class PreviewAddon extends Addon {
 		return { demoStatus: this.enabled };
 	}
 
-	/*
-	setImage (imageUrl: string, data: HTMLImageElement) {
+	updateOverlay(ctx: AddonContext, aspect: number) {
 		if (!this.geometry || !this.material || !this.mesh) {
 			return;
 		}
 
-		if (this.mesh.material.map) {
-			this.mesh.material.map.dispose();
-		}
-	
-		const loader = new THREE.TextureLoader();
-		loader.load(imageUrl, (texture) => {
-			if (!this.material) {
-				return;
-			}
+		const camera = ctx.viewport.camera;
 
-			const aspect = data.width / data.height;
-			this.material.map = texture;
-			this.material.needsUpdate = true;
-	
-			this.updateOverlay(aspect);
-		});
-	}
-
-	updateOverlay (imgAspect: number) {
-		if (!this.geometry || !this.material || !this.mesh) {
-			return;
-		}
-
-		const viewAspect = window.innerWidth / window.innerHeight;
-		const isContainFit = imgAspect <= viewAspect;
+		const viewAspect = ctx.ui.viewport.offsetWidth / ctx.ui.viewport.offsetHeight;
+		const isContainFit = aspect <= viewAspect;
 	
 		const img = this.material.map!.image as HTMLImageElement;
 		const width = img.naturalWidth;
 		const height = img.naturalHeight;
 	
 		const distance = isContainFit
-			? height / (2 * tanHalfFov())
+			? height / (2 * tanHalfFov(camera.fov))
 			: width / (2 * Math.tan(hfovFromVfov(camera.fov, viewAspect) / 2));
 	
-		mesh.geometry.dispose();
-		mesh.geometry = new THREE.PlaneGeometry(width, height);
+		this.mesh.geometry.dispose();
+		this.mesh.geometry = new THREE.PlaneGeometry(width, height);
 	
 		const camDir = new THREE.Vector3();
 		camera.getWorldDirection(camDir);
-		mesh.position.copy(camera.position).add(camDir.multiplyScalar(distance));
+		this.mesh.position.copy(camera.position).add(camDir.multiplyScalar(distance));
 	
 		// Align plane to face the same direction as camera
-		mesh.quaternion.copy(camera.quaternion);
-	};
-	*/
+		this.mesh.quaternion.copy(camera.quaternion);
+
+	}
 }

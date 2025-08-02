@@ -10,7 +10,7 @@ import { loadInitialAddons } from "./ui/components/addonLoaderScreen/loader";
 import { GeometryAddon } from "./addons/geometry/GeometryAddon.ts";
 import { PreviewAddon } from "./addons/preview/PreviewAddon.ts";
 
-const debug = false;
+const debug = true;
 
 const addons = {
 	core: [ ViewportAddon, GeometryAddon, PreviewAddon ],
