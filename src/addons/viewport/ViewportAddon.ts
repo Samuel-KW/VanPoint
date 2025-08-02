@@ -94,7 +94,7 @@ export class ViewportAddon extends Addon {
 			return;
 		}
 
-		alert("Warning: You have disabled the core viewport addon. This may cause issues with the application.");
+		console.warn("Warning: You have disabled the core viewport addon. This may cause issues with the application.");
 	
 		if (ctx.debug && this.stats) {
 			ctx.ui.viewport.removeChild(this.stats.dom);
@@ -114,7 +114,7 @@ export class ViewportAddon extends Addon {
 			return;
 		}
 		this.enabled = false;
-		alert("Warning: You have removed the core viewport addon. This may cause issues with the application.");
+		console.warn("Warning: You have removed the core viewport addon. This may cause issues with the application.");
 		
 		this.resizeObserver.disconnect();
 		this.scene.clear();
