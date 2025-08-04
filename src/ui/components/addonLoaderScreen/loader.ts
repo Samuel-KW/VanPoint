@@ -58,6 +58,7 @@ export async function loadInitialAddons(manager: AddonManager, addons: AddonMap,
 	progressDetails.textContent = `Took ${Math.round((Date.now() - start) / 10) / 100}s`;
 	progressBar.value = progressBar.max;
 
+	container.style.pointerEvents = "none";
 	container.style.animation = "fade-out 1s ease-in-out forwards 0.5s";
 	setTimeout(() => container.remove(), 3000);
 
