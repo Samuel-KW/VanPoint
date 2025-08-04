@@ -11,11 +11,13 @@ import { GeometryAddon } from "./addons/geometry/GeometryAddon.ts";
 import { PreviewAddon } from "./addons/preview/PreviewAddon.ts";
 import { DebugBordersAddon } from "./addons/debugBorders/BordersAddon.ts";
 import { DirectionSphereAddon } from "./addons/directionSphere/DirectionSphereAddon.ts";
+import { VapidAddon } from "./addons/vapid/VapidAddon.ts";
+import { ImageSelectorAddon } from "./addons/imageSelector/ImageSelectorAddon.ts";
 
 const debug = true;
 
 const addons = {
-	core: [ ViewportAddon, GeometryAddon, PreviewAddon ],
+	core: [ ViewportAddon, GeometryAddon, PreviewAddon, VapidAddon, ImageSelectorAddon ],
 	extended: [ ],
 	custom: [],
 	debug: [ DebugBordersAddon, DirectionSphereAddon ]
