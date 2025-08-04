@@ -27,7 +27,7 @@ export class DebugBordersAddon extends Addon {
 	name = "Debug Borders";
 	description = "Debug UI element borders";
 
-	private hidden = false;
+	// private hidden = false;
 
 	async onRegister(_: AddonContext) {}
 
