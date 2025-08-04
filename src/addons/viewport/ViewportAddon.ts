@@ -26,7 +26,7 @@ export class ViewportAddon extends Addon {
 	private dragEndListener?: (event: MouseEvent | TouchEvent) => void;
 	private dragStartListener?: (event: MouseEvent | TouchEvent) => void;
 	private dragListener?: (event: MouseEvent | TouchEvent) => void;
-	private imageLoadListener?: (image: HTMLImageElement) => void;
+	private imageLoadListener?: ({ width, height }: { width: number, height: number }) => void;
 	
 	private debug = false;
 
@@ -57,9 +57,9 @@ export class ViewportAddon extends Addon {
 		this.directionalLight.position.set(20, 20, 0);
 
 		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-		this.controls.enableRotate = false;
-		this.controls.enableZoom = false;
-		this.controls.enablePan = false;
+		// this.controls.enableRotate = false;
+		// this.controls.enableZoom = false;
+		// this.controls.enablePan = false;
 		
 		this.helper = new ViewHelper(this.camera, this.renderer.domElement);
 		this.helper.setLabels("X", "Y", "Z");
@@ -87,22 +87,19 @@ export class ViewportAddon extends Addon {
 		window.addEventListener("mousemove", this.dragListener);
 		window.addEventListener("touchmove", this.dragListener);
 
-		this.imageLoadListener = (image: HTMLImageElement) => {
+		this.imageLoadListener = ({ width, height }: { width: number, height: number }) => {
 			const availWidth = ctx.ui.viewport.offsetWidth;
 			const availHeight = ctx.ui.viewport.offsetHeight;
 
-			const imgWidth = image.naturalWidth;
-			const imgHeight = image.naturalHeight;
+			const scale = Math.min(availWidth / width, availHeight / height);
+			const scaledWidth = width * scale;
+			const scaledHeight = height * scale;
 
-			const scale = Math.min(availWidth / imgWidth, availHeight / imgHeight);
-			const width = imgWidth * scale;
-			const height = imgHeight * scale;
-
-			ctx.viewport.renderer.setSize(width, height);
-			ctx.viewport.camera.aspect = width / height;
+			ctx.viewport.renderer.setSize(scaledWidth, scaledHeight);
+			ctx.viewport.camera.aspect = scaledWidth / scaledHeight;
 			ctx.viewport.camera.updateProjectionMatrix();
 		}
-		ctx.events.on("image:loaded", this.imageLoadListener);
+		ctx.events.on("image:load", this.imageLoadListener);
 
 		this.scene.add(this.ambientLight);
 		this.scene.add(this.directionalLight);
@@ -129,7 +126,7 @@ export class ViewportAddon extends Addon {
 		window.removeEventListener("touchend", this.dragEndListener);
 		window.removeEventListener("mousemove", this.dragListener);
 		window.removeEventListener("touchmove", this.dragListener);
-		ctx.events.off("image:loaded", this.imageLoadListener);
+		ctx.events.off("image:load", this.imageLoadListener);
 
 		this.scene.remove(this.ambientLight);
 		this.scene.remove(this.directionalLight);
@@ -178,9 +175,9 @@ export class ViewportAddon extends Addon {
 			return;
 		}
 
-		this.camera.position.x += 0.01;
-		this.camera.position.y += 0.01;
-		this.camera.lookAt(0, 0, 0);
+		// this.camera.position.x += 0.01;
+		// this.camera.position.y += 0.01;
+		// this.camera.lookAt(0, 0, 0);
 
 		this.renderer.clear();
 		this.controls.update();
@@ -193,7 +190,7 @@ export class ViewportAddon extends Addon {
 	}
 
 	dragStart(event: MouseEvent | TouchEvent, ctx: AddonContext) {
-		if (!this.enabled) {
+		if (!this.enabled || event.target === ctx.viewport.renderer.domElement) {
 			return;
 		}
 

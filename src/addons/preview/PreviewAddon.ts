@@ -5,7 +5,9 @@ export class PreviewAddon extends Addon {
 	name = "Image Preview";
 	description = "Adds a 3D preview of the uploaded image"
 
-	private imgSrc?: String;
+	private file?: File;
+	private src?: string;
+
 	private button?: HTMLButtonElement;
 	private properties?: HTMLDivElement;
 
@@ -37,19 +39,17 @@ export class PreviewAddon extends Addon {
 		ctx.ui.widgets.appendChild(this.button);
 		ctx.ui.propertyPanel.appendChild(this.properties);
 
-		ctx.events.on("image:loaded", (image: HTMLImageElement) => {
-			this.imgSrc = image.src;
+		ctx.events.on("image:load", ({ file, src }: { file: File, src: string }) => {
+			if (this.src) {
+				URL.revokeObjectURL(this.src);
+			}
+			this.file = file;
+			this.src = src;
 			this.updateBackground(ctx, false);
 		});
 
-		if (this.imgSrc) {
+		if (this.file) {
 			this.updateBackground(ctx, false);
-		} else if (ctx.debug) {
-			const img = new Image();
-			img.onload = () => {
-				ctx.events.emit("image:loaded", img);
-			};
-			img.src = "assets/subway.avif";
 		}
 	}
 
@@ -68,13 +68,16 @@ export class PreviewAddon extends Addon {
 			return;
 		}
 
-		this.imgSrc = undefined;
+		this.file = undefined;
 		this.properties = undefined;
 		this.hidden = false;
 	}
 
 	exports() {
-		return {};
+		return {
+			file: this.file,
+			src: this.src
+		};
 	}
 
 	updateBackground (ctx: AddonContext, hidden: boolean) {
@@ -89,10 +92,10 @@ export class PreviewAddon extends Addon {
 		}
 
 		const elem = ctx.viewport.renderer.domElement;
-		if (hidden || !this.imgSrc) {
+		if (hidden || !this.src) {
 			elem.style.background = "";
 		} else {
-			elem.style.background = `var(--bg-color-3) url(${this.imgSrc}) no-repeat center center / contain`;
+			elem.style.background = `var(--bg-color-3) url(${this.src}) no-repeat center center / contain`;
 		}
 
 		this.hidden = hidden;
