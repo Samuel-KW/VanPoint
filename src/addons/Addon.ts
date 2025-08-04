@@ -11,7 +11,7 @@ export class Addon {
 	onEnable(_: AddonContext): Promise<void> | void { throw new Error("onEnable() method not implemented"); }
 	onDisable(_: AddonContext): Promise<void> | void { throw new Error("onDisable() method not implemented"); }
 	onDestroy(_: AddonContext): Promise<void> | void { throw new Error("onDestroy() method not implemented"); }
-	exports(): Record<string, unknown> { throw new Error("exports() method not implemented"); }
+	exports(): any { throw new Error("exports() method not implemented"); }
 }
 
 export interface AddonContext {
@@ -28,6 +28,5 @@ export interface AddonContext {
 	};
 	debug: boolean;
 	events: EventBus;
-	exports: <T = any>(id: string) => T;
-	_exports: Record<string, any>; // internal reference for getter function
+	exports: <T = any>(id: string) => T | undefined;
 }

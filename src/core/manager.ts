@@ -8,6 +8,7 @@ export default class AddonManager {
 	private exports: Record<string, any> = {};
 
 	constructor(debug = false) {
+		const self = this;
 		this.context = {
 			viewport: {
 				scene:  new Scene(),
@@ -22,10 +23,9 @@ export default class AddonManager {
 			},
 			debug,
 			events: new EventBus(),
-			get exports() {
-				return (id: string) => this._exports[id];
-			},
-			_exports: this.exports
+			exports(id) {
+				return self.addons.get(id)?.exports();
+			}
 		}
 	}
 
