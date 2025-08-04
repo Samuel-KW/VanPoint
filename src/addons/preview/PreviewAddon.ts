@@ -1,7 +1,7 @@
 import { Addon, type AddonContext } from "../Addon";
 
 export class PreviewAddon extends Addon {
-	id = "previewImage";
+	id = "preview";
 	name = "Image Preview";
 	description = "Adds a 3D preview of the uploaded image"
 

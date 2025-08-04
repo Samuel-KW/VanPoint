@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Addon, type AddonContext } from "../Addon";
 
 export class DirectionSphereAddon extends Addon {
-	id = "vpDirectionSphere";
+	id = "debugDirectionSphere";
 	name = "Vanishing Point Sphere";
 	description = "Displays a unit sphere for vanishing point direction visualization";
 
