@@ -5,8 +5,8 @@ import "./ui/components/interface/interface.ts"
 import "./ui/components/propertyMenu/property.ts"
 import "./ui/components/widgets/widgets.ts"
 import AddonManager from "./core/manager";
-import { ViewportAddon } from "./addons/viewport/ViewportAddon";
 import { loadInitialAddons } from "./ui/components/addonLoaderScreen/loader";
+import { ViewportAddon } from "./addons/viewport/ViewportAddon";
 import { GeometryAddon } from "./addons/geometry/GeometryAddon.ts";
 import { PreviewAddon } from "./addons/preview/PreviewAddon.ts";
 import { DebugBordersAddon } from "./addons/debugBorders/BordersAddon.ts";
@@ -16,11 +16,16 @@ import { ImageSelectorAddon } from "./addons/imageSelector/ImageSelectorAddon.ts
 
 const debug = true;
 
-const addons = {
-	core: [ ViewportAddon, GeometryAddon, PreviewAddon, VapidAddon, ImageSelectorAddon ],
-	extended: [ ],
+export const avaliableAddons = [
+	ViewportAddon, GeometryAddon, PreviewAddon, VapidAddon, ImageSelectorAddon,
+	DebugBordersAddon, DirectionSphereAddon
+];
+
+export const addons = {
+	core: [ ViewportAddon, GeometryAddon, PreviewAddon, ImageSelectorAddon ],
+	extended: [],
 	custom: [],
-	debug: [ DebugBordersAddon, DirectionSphereAddon ]
+	debug: [ DebugBordersAddon ]
 };
 
 const manager = new AddonManager(debug);
