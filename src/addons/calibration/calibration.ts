@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { Addon, type AddonContext } from "../Addon";
-import { OrbitControls } from "three/examples/jsm/Addons.js";
 
 export class CalibrationAddon extends Addon {
 	id = "calibration";
