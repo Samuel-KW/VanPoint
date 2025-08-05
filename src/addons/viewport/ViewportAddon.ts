@@ -1,6 +1,5 @@
 import * as THREE from "three";
 import { ViewHelper } from "three/addons/helpers/ViewHelper.js";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { Addon, type AddonContext } from "../Addon";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 
@@ -12,7 +11,6 @@ export class ViewportAddon extends Addon {
 	private scene?: THREE.Scene;
 	private camera?: THREE.PerspectiveCamera;
 	private renderer?: THREE.WebGLRenderer;
-	private controls?: OrbitControls;
 	private helper?: ViewHelper;
 	private stats?: Stats;
 
@@ -55,18 +53,13 @@ export class ViewportAddon extends Addon {
 
 		this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 		this.directionalLight.position.set(20, 20, 0);
-
-		this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-		// this.controls.enableRotate = false;
-		// this.controls.enableZoom = false;
-		// this.controls.enablePan = false;
 		
 		this.helper = new ViewHelper(this.camera, this.renderer.domElement);
 		this.helper.setLabels("X", "Y", "Z");
 	}
 
 	async onEnable(ctx: AddonContext) {
-		if (!this.scene || !this.camera || !this.renderer || !this.controls || !this.helper || !this.ambientLight || !this.directionalLight) {
+		if (!this.scene || !this.camera || !this.renderer || !this.helper || !this.ambientLight || !this.directionalLight) {
 			return;
 		}
 
@@ -135,7 +128,7 @@ export class ViewportAddon extends Addon {
 	}
 
 	async onDestroy(_: AddonContext) {
-		if (!this.scene || !this.camera || !this.renderer || !this.controls || !this.helper || !this.ambientLight || !this.directionalLight) {
+		if (!this.scene || !this.camera || !this.renderer || !this.helper || !this.ambientLight || !this.directionalLight) {
 			return;
 		}
 		console.warn("Warning: You have removed the core viewport addon. This may cause issues with the application.");
@@ -144,13 +137,11 @@ export class ViewportAddon extends Addon {
 		this.renderer.dispose();
 		this.ambientLight.dispose();
 		this.directionalLight.dispose();
-		this.controls.dispose();
 		this.helper.dispose();
 
 		this.scene = undefined;
 		this.camera = undefined;
 		this.renderer = undefined;
-		this.controls = undefined;
 		this.helper = undefined;
 		this.stats = undefined;
 		this.ambientLight = undefined;
@@ -163,7 +154,7 @@ export class ViewportAddon extends Addon {
 	}
 
 	exports() {
-		return {};
+		return { viewHelper: this.helper };
 	}
 
 	animate() {
@@ -171,7 +162,7 @@ export class ViewportAddon extends Addon {
 			return;
 		}
 		requestAnimationFrame(() => this.animate());
-		if (!this.scene || !this.camera || !this.renderer || !this.helper || !this.controls) {
+		if (!this.scene || !this.camera || !this.renderer || !this.helper) {
 			return;
 		}
 
@@ -180,7 +171,6 @@ export class ViewportAddon extends Addon {
 		// this.camera.lookAt(0, 0, 0);
 
 		this.renderer.clear();
-		this.controls.update();
 		this.renderer.render(this.scene, this.camera);
 		this.helper.render(this.renderer);
 

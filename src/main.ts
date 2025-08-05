@@ -13,16 +13,17 @@ import { DebugBordersAddon } from "./addons/debugBorders/BordersAddon.ts";
 import { DirectionSphereAddon } from "./addons/directionSphere/DirectionSphereAddon.ts";
 import { VapidAddon } from "./addons/vapid/VapidAddon.ts";
 import { ImageSelectorAddon } from "./addons/imageSelector/ImageSelectorAddon.ts";
+import { CalibrationAddon } from "./addons/calibration/calibration.ts";
 
 const debug = true;
 
 export const avaliableAddons = [
 	ViewportAddon, GeometryAddon, PreviewAddon, VapidAddon, ImageSelectorAddon,
-	DebugBordersAddon, DirectionSphereAddon
+	DebugBordersAddon, DirectionSphereAddon, CalibrationAddon
 ];
 
 export const addons = {
-	core: [ ViewportAddon, GeometryAddon, PreviewAddon, ImageSelectorAddon ],
+	core: [ ViewportAddon, GeometryAddon, PreviewAddon, ImageSelectorAddon, CalibrationAddon ],
 	extended: [],
 	custom: [],
 	debug: [ DebugBordersAddon ]

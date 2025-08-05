@@ -29,7 +29,7 @@ export class EventBus {
 	 * @param event The event name to emit
 	 * @param payload The event payload to pass to the handlers
 	 */
-	emit<T = unknown>(event: string, payload: T): void {
+	emit<T = unknown>(event: string, payload?: T): void {
 		(this.handlers[event] || []).forEach(handler => handler(payload));
 	}
 }
