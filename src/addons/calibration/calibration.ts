@@ -12,7 +12,7 @@ export class CalibrationAddon extends Addon {
 	private properties?: HTMLDivElement;
 
 	async onRegister(ctx: AddonContext) {
-		this.camera = ctx.viewport.camera
+		this.camera = ctx.viewport.camera;
 
 		this.button = document.createElement("button");
 		this.button.innerHTML = "📷";
@@ -38,7 +38,7 @@ export class CalibrationAddon extends Addon {
 			return;
 		}
 
-		this.camera = ctx.viewport.camera
+		this.camera = ctx.viewport.camera;
 
 		ctx.ui.widgets.appendChild(this.button);
 		ctx.ui.propertyPanel.appendChild(this.properties);
@@ -91,5 +91,49 @@ export class CalibrationAddon extends Addon {
 			center[1] + y,
 			center[2] + z,
 		];
+	}
+
+	leastSquaresIntersection(lines: [[number, number, number, number]]): [number, number] | null {
+		let A = 0, B = 0, C = 0, D = 0, E = 0;
+
+		for (const [x1, y1, x2, y2] of lines) {
+			const dx = x2 - x1;
+			const dy = y2 - y1;
+			const lenSq = dx * dx + dy * dy;
+
+			if (lenSq === 0) continue; // skip degenerate lines
+
+			// Unit direction vector
+			const ux = dx / Math.sqrt(lenSq);
+			const uy = dy / Math.sqrt(lenSq);
+
+			// Projection matrix: P = I - d*d^T
+			// Applied to point difference: P(p - a)
+			const nx = -uy;
+			const ny = ux;
+
+			// Coefficients for normal equation system
+			const nxx = nx * nx;
+			const nxy = nx * ny;
+			const nyy = ny * ny;
+
+			A += nxx;
+			B += nxy;
+			C += nyy;
+
+			const dot = nx * x1 + ny * y1;
+			D += nx * dot;
+			E += ny * dot;
+		}
+
+		const det = A * C - B * B;
+		if (Math.abs(det) < 1e-10) {
+			return null; // Ill-conditioned system (all lines parallel)
+		}
+
+		const x = (C * D - B * E) / det;
+		const y = (A * E - B * D) / det;
+
+		return [x, y];
 	}
 }
