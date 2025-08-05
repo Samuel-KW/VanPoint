@@ -28,11 +28,7 @@
 	display: block;
 }
 
-#hamburger-toggle {
-    display: none;
-}
-
-#hamburger-label {
+.hamburger-menu {
     cursor: pointer;
 	width: 3em;
 	height: 3em;
@@ -41,65 +37,57 @@
 	top: 1em;
 	left: 1em;
 	display: none;
+	flex-direction: column;
+	justify-content: space-evenly;
+	align-items: center;
+	border-radius: 5px 5px 0 0;
 
-	.icon-menu-close {
-		pointer-events: none;
-		display: flex;
-		flex-direction: column;
-		justify-content: space-evenly;
-		align-items: center;
-		width: 100%;
-		height: 100%;
-		border-radius: 5px 5px 0 0;
+	div {
+		background-color: var(--primary-3);
+		height: 3px;
+		transition: background-color 300ms ease, transform 300ms ease, opacity 300ms ease;
+		width: 70%;
+		position: absolute;
+		opacity: 1;
+		border-radius: 3px;
 
-		div {
-			background-color: var(--primary-3);
-			height: 3px;
-			transition: background-color 300ms ease, transform 300ms ease, opacity 300ms ease;
-			width: 70%;
-			position: absolute;
-			opacity: 1;
-			border-radius: 3px;
+		&:nth-child(1) {
+			transform: translateY(-8px);
+		}
 
-			&:nth-child(1) {
-				transform: translateY(-8px);
-			}
-
-			&:nth-child(3) {
-				transform: translateY(8px);
-			}
+		&:nth-child(3) {
+			transform: translateY(8px);
 		}
 	}
 }
 
-#hamburger-label:hover > .icon-menu-close > div {
+.hamburger-menu:hover > div {
 	background-color: var(--primary-2);
 }
 
-#hamburger-toggle:checked + #hamburger-label {
+.hamburger-menu.open {
+	background-color: var(--bg-color-5);
 
-	.icon-menu-close {
-		background-color: var(--bg-color-5);
+	div {
+		background-color: var(--secondary-2);
+		margin: 0;
 
-		div {
-			background-color: var(--secondary-2);
+		&:nth-child(1) {
 			transform: rotate(45deg);
-			margin: 0;
 		}
-
-		div:nth-child(1) {
-			transform: rotate(-45deg);
-		}
-
-		div:nth-child(2) {
+		
+		&:nth-child(2) {
 			opacity: 0;
 		}
-
+		
+		&:nth-child(3) {
+			transform: rotate(-45deg);
+		}
 	}
 }
 
-#hamburger-toggle:checked ~ #toolbar {
-	display: flex;
+.hamburger-menu.open ~ div {
+	display: flex !important;
 }
 
 @media only screen and (max-width: 600px) {
@@ -108,8 +96,8 @@
 		height: 0;
 	}
 
-	#hamburger-label {
-		display: block;
+	.hamburger-menu {
+		display: flex;
 	}
 
 	#toolbar {
