@@ -139,7 +139,7 @@ export class OverlayAddon extends Addon {
 
 	async onDestroy(_: AddonContext) {
 		this.observer?.disconnect();
-		this.annotations.clear();
+		this.lines = [];
 		this.canvas = undefined;
 		this.context = undefined;
 		this.animationFrame = undefined;
@@ -167,10 +167,7 @@ export class OverlayAddon extends Addon {
 	};
 
 	exports() {
-		return {
-			addAnnotation: (a: Annotation) => this.addAnnotation(a),
-			removeAnnotation: (id: string) => this.removeAnnotation(id),
-		};
+		return {};
 	}
 
 	onDrag(data: { x: number, y: number, dX: number, dY: number }, ctx: AddonContext) {
