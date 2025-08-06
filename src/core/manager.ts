@@ -1,6 +1,6 @@
 import { Scene, PerspectiveCamera, WebGLRenderer } from "three";
 import type { Addon, AddonContext } from "../addons/Addon";
-import { EventBus } from "./events";
+import { on, off, emit } from "./events";
 
 export default class AddonManager {
 	private addons: Map<string, Addon> = new Map();
@@ -22,7 +22,7 @@ export default class AddonManager {
 				viewport: document.getElementById("viewport") as HTMLDivElement
 			},
 			debug,
-			events: new EventBus(),
+			events: { on, off, emit },
 			exports(id) {
 				return self.addons.get(id)?.exports();
 			}

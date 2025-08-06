@@ -1,5 +1,5 @@
 import { PerspectiveCamera, Scene, WebGLRenderer } from "three";
-import type { EventBus } from "../core/events";
+import type { on, off, emit } from "../core/events";
 
 export class Addon {
 	id: string = "";
@@ -27,6 +27,6 @@ export interface AddonContext {
 		viewport: HTMLElement;
 	};
 	debug: boolean;
-	events: EventBus;
+	events: { on: typeof on; off: typeof off; emit: typeof emit };
 	exports: <T = any>(id: string) => T | undefined;
 }

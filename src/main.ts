@@ -4,6 +4,7 @@ import "./ui/components/toolbar/toolbar.ts"
 import "./ui/components/interface/interface.ts"
 import "./ui/components/propertyMenu/property.ts"
 import "./ui/components/widgets/widgets.ts"
+import "./ui/components/viewport/viewport.ts"
 import AddonManager from "./core/manager";
 import { loadInitialAddons } from "./ui/components/addonLoaderScreen/loader";
 import { ViewportAddon } from "./addons/viewport/ViewportAddon";
@@ -14,6 +15,7 @@ import { DirectionSphereAddon } from "./addons/directionSphere/DirectionSphereAd
 import { VapidAddon } from "./addons/vapid/VapidAddon.ts";
 import { ImageSelectorAddon } from "./addons/imageSelector/ImageSelectorAddon.ts";
 import { CalibrationAddon } from "./addons/calibration/calibration.ts";
+import { OverlayAddon } from "./addons/overlay/overlay.ts";
 
 const debug = true;
 
@@ -23,7 +25,7 @@ export const avaliableAddons = [
 ];
 
 export const addons = {
-	core: [ ViewportAddon, GeometryAddon, PreviewAddon, ImageSelectorAddon, CalibrationAddon ],
+	core: [ ViewportAddon, GeometryAddon, PreviewAddon, ImageSelectorAddon, CalibrationAddon, OverlayAddon ],
 	extended: [],
 	custom: [],
 	debug: [ DebugBordersAddon ]

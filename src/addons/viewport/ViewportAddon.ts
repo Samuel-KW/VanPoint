@@ -5,7 +5,7 @@ import Stats from "three/examples/jsm/libs/stats.module.js";
 
 export class ViewportAddon extends Addon {
 	id = "viewport";
-	name = "Core viewport addon";
+	name = "3D viewport addon";
 	description = "Adds the 3D viewport";
 
 	private scene?: THREE.Scene;
@@ -17,13 +17,8 @@ export class ViewportAddon extends Addon {
 	private ambientLight?: THREE.AmbientLight;
 	private directionalLight?: THREE.DirectionalLight;
 	
-	private offset = { x: 0, y: 0 };
 	private position = { x: 0, y: 0 };
-	private initialPos = { x: 0, y: 0 };
-	private dragging = false;
-	private dragEndListener?: (event: MouseEvent | TouchEvent) => void;
-	private dragStartListener?: (event: MouseEvent | TouchEvent) => void;
-	private dragListener?: (event: MouseEvent | TouchEvent) => void;
+	private dragListener?: (data: { x: number, y: number, dX: number, dY: number }) => void;
 	private imageLoadListener?: ({ width, height }: { width: number, height: number }) => void;
 	
 	private debug = false;
@@ -68,17 +63,8 @@ export class ViewportAddon extends Addon {
 			this.debug = true;
 		}
 
-		this.dragStartListener = (event: MouseEvent | TouchEvent) => this.dragStart(event, ctx);
-		ctx.ui.viewport.addEventListener("mousedown", this.dragStartListener);
-		ctx.ui.viewport.addEventListener("touchstart", this.dragStartListener);
-		
-		this.dragEndListener = () => this.dragEnd();
-		window.addEventListener("mouseup", this.dragEndListener);
-		window.addEventListener("touchend", this.dragEndListener);
-		
-		this.dragListener = (event: MouseEvent | TouchEvent) => this.drag(event, ctx);
-		window.addEventListener("mousemove", this.dragListener);
-		window.addEventListener("touchmove", this.dragListener);
+		this.dragListener = data => this.drag(data, ctx);
+		ctx.events.on("viewport:drag", this.dragListener);
 
 		this.imageLoadListener = ({ width, height }: { width: number, height: number }) => {
 			const availWidth = ctx.ui.viewport.offsetWidth;
@@ -103,7 +89,7 @@ export class ViewportAddon extends Addon {
 	}	
 
 	async onDisable(ctx: AddonContext) {
-		if (!this.scene || !this.camera || !this.renderer || !this.ambientLight || !this.directionalLight || !this.dragEndListener || !this.dragStartListener || !this.dragListener || !this.imageLoadListener) {
+		if (!this.scene || !this.camera || !this.renderer || !this.ambientLight || !this.directionalLight || !this.dragListener || !this.imageLoadListener) {
 			return;
 		}
 
@@ -113,13 +99,8 @@ export class ViewportAddon extends Addon {
 			ctx.ui.viewport.removeChild(this.stats.dom);
 		}
 
-		ctx.ui.viewport.removeEventListener("mousedown", this.dragStartListener);
-		ctx.ui.viewport.removeEventListener("touchstart", this.dragStartListener);
-		window.removeEventListener("mouseup", this.dragEndListener);
-		window.removeEventListener("touchend", this.dragEndListener);
-		window.removeEventListener("mousemove", this.dragListener);
-		window.removeEventListener("touchmove", this.dragListener);
 		ctx.events.off("image:load", this.imageLoadListener);
+		ctx.events.off("viewport:drag", this.dragListener);
 
 		this.scene.remove(this.ambientLight);
 		this.scene.remove(this.directionalLight);
@@ -147,8 +128,6 @@ export class ViewportAddon extends Addon {
 		this.ambientLight = undefined;
 		this.directionalLight = undefined;
 
-		this.dragStartListener = undefined;
-		this.dragEndListener = undefined;
 		this.dragListener = undefined;
 		this.imageLoadListener = undefined;
 	}
@@ -166,10 +145,6 @@ export class ViewportAddon extends Addon {
 			return;
 		}
 
-		// this.camera.position.x += 0.01;
-		// this.camera.position.y += 0.01;
-		// this.camera.lookAt(0, 0, 0);
-
 		this.renderer.clear();
 		this.renderer.render(this.scene, this.camera);
 		this.helper.render(this.renderer);
@@ -179,59 +154,12 @@ export class ViewportAddon extends Addon {
 		}
 	}
 
-	dragStart(event: MouseEvent | TouchEvent, ctx: AddonContext) {
-		if (!this.enabled || event.target === ctx.viewport.renderer.domElement) {
-			return;
-		}
-
-		let posX, posY;
-
-		if (event instanceof TouchEvent) {
-			posX = event.touches[0].clientX;
-			posY = event.touches[0].clientY;
-		} else {
-			posX = event.clientX;
-			posY = event.clientY;
-		}
-
-		this.initialPos.x = posX - this.offset.x;
-		this.initialPos.y = posY - this.offset.y;
-
-		this.dragging = true;
-		
-		this.drag(event, ctx);
-	}
-
-	dragEnd() {
+	drag(data: { x: number, y: number, dX: number, dY: number }, ctx: AddonContext) {
 		if (!this.enabled) {
 			return;
 		}
-		this.initialPos.x = this.position.x;
-		this.initialPos.y = this.position.y;
-		this.dragging = false;
-	}
-
-	drag(event: MouseEvent | TouchEvent, ctx: AddonContext) {
-		if (!this.enabled || !this.renderer || !this.dragging) {
-			return;
-		}
-		
-		let currentX, currentY;
-		if (event instanceof TouchEvent) {
-			currentX = event.touches[0].clientX;
-			currentY = event.touches[0].clientY;
-		} else {
-			currentX = event.clientX;
-			currentY = event.clientY;
-		}
-		currentX -= this.initialPos.x;
-		currentY -= this.initialPos.y;
-
-		this.offset.x = currentX;
-		this.offset.y = currentY;
-
-		this.position.x = currentX;
-		this.position.y = currentY;
+		this.position.x += data.dX;
+		this.position.y += data.dY;
 
 		const parent = ctx.viewport.renderer.domElement;
 		parent.style.left = `${this.position.x}px`;
