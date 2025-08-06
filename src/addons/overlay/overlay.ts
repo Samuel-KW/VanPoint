@@ -25,7 +25,7 @@ export class OverlayAddon extends Addon {
 		this.canvas.style.top = "0";
 		this.canvas.style.left = "0";
 		this.canvas.style.pointerEvents = "none";
-		this.canvas.style.zIndex = "10";
+		this.canvas.style.zIndex = "5";
 
 		const resize = () => {
 			if (!this.canvas || !ctx.ui.viewport) return;
@@ -39,7 +39,9 @@ export class OverlayAddon extends Addon {
 	}
 
 	async onEnable(ctx: AddonContext) {
-		if (!this.canvas) return;
+		if (!this.canvas) {
+			return;
+		}
 
 		ctx.ui.viewport.appendChild(this.canvas);
 		this.context = this.canvas.getContext("2d")!;
@@ -50,12 +52,16 @@ export class OverlayAddon extends Addon {
 
 		this.addAnnotation({
 			id: "line1",
-			draw(ctx, offset) {
-				ctx.strokeStyle = "red";
-				ctx.beginPath();
-				ctx.moveTo(offset.x, offset.y);
-				ctx.lineTo(offset.x + 100, offset.y + 100);
-				ctx.stroke();
+			draw: (ctx, offset) => {
+				if (!this.canvas) {
+					return;
+				}
+				this.drawExtendedLineToCanvasEdge([
+					offset.x,
+					offset.y,
+					offset.x + 1,
+					offset.y + 3,
+				], this.canvas, ctx);
 			}
 		});
 	}
@@ -102,6 +108,7 @@ export class OverlayAddon extends Addon {
 		for (const annotation of this.annotations.values()) {
 			annotation.draw(ctx, this.offset);
 		}
+		
 	};
 
 	exports() {
@@ -114,5 +121,80 @@ export class OverlayAddon extends Addon {
 	onDrag(data: { x: number, y: number, dX: number, dY: number }, ctx: AddonContext) {
 		this.offset.x += data.dX;
 		this.offset.y += data.dY;
+	}
+
+	drawExtendedLineToCanvasEdge(
+		line: [number, number, number, number],
+		canvas: HTMLCanvasElement,
+		ctx: CanvasRenderingContext2D
+	): void {
+		const [x1, y1, x2, y2] = line;
+		const width = canvas.width;
+		const height = canvas.height;
+
+		const dx = x2 - x1;
+		const dy = y2 - y1;
+
+		if (dx === 0 && dy === 0) {
+			// Degenerate line (a point)
+			return;
+		}
+
+		let points: [number, number][] = [];
+
+		// Handle vertical lines
+		if (dx === 0) {
+			points.push([x1, 0], [x1, height]);
+		}
+		// Handle horizontal lines
+		else if (dy === 0) {
+			points.push([0, y1], [width, y1]);
+		}
+		// General case
+		else {
+			const m = dy / dx;
+			const b = y1 - m * x1;
+
+			const candidates: [number, number][] = [];
+
+			// Left edge (x = 0)
+			const y_at_x0 = b;
+			if (y_at_x0 >= 0 && y_at_x0 <= height) {
+				candidates.push([0, y_at_x0]);
+			}
+
+			// Right edge (x = width)
+			const y_at_xw = m * width + b;
+			if (y_at_xw >= 0 && y_at_xw <= height) {
+				candidates.push([width, y_at_xw]);
+			}
+
+			// Top edge (y = 0)
+			const x_at_y0 = -b / m;
+			if (x_at_y0 >= 0 && x_at_y0 <= width) {
+				candidates.push([x_at_y0, 0]);
+			}
+
+			// Bottom edge (y = height)
+			const x_at_yh = (height - b) / m;
+			if (x_at_yh >= 0 && x_at_yh <= width) {
+				candidates.push([x_at_yh, height]);
+			}
+
+			// Deduplicate and pick at most 2 valid points
+			for (const pt of candidates) {
+				if (!points.some(p => Math.abs(p[0] - pt[0]) < 1e-5 && Math.abs(p[1] - pt[1]) < 1e-5)) {
+					points.push(pt);
+					if (points.length === 2) break;
+				}
+			}
+		}
+
+		if (points.length === 2) {
+			ctx.beginPath();
+			ctx.moveTo(points[0][0], points[0][1]);
+			ctx.lineTo(points[1][0], points[1][1]);
+			ctx.stroke();
+		}
 	}
 }
