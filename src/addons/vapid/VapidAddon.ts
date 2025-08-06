@@ -2,7 +2,8 @@
  * https://vgl.ict.usc.edu/Research/VaPiD/
  */
 
-import { Addon, type AddonContext } from "../Addon";
+import type { AddonContext } from "../../core/context";
+import { Addon } from "../Addon";
 
 export class VapidAddon extends Addon {
 	id = "vapid";

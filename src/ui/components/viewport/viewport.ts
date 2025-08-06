@@ -14,11 +14,12 @@ const drag = (event: MouseEvent | TouchEvent) => {
 
 	let x, y;
 	if (event instanceof TouchEvent) {
-		if (event.touches.length !== 1) {
+		if (event.touches.length !== 2) {
 			return;
 		}
 		x = event.touches[0].clientX - viewport.offsetLeft;
 		y = event.touches[0].clientY - viewport.offsetTop;	
+		event.preventDefault();
 	} else {
 		if (event.buttons !== 1) {
 			return;
@@ -44,18 +45,20 @@ const dragStart = (event: MouseEvent | TouchEvent) => {
 		prevY = event.clientY - viewport.offsetTop;
 	}
 
+	emit("viewport:dragStart", { x: prevX, y: prevY });
 	drag(event);
 };
 
 const dragEnd = () => {
 	dragging = false;
+	emit("viewport:dragEnd");
 };
 
 viewport.addEventListener("mousedown", dragStart);
-viewport.addEventListener("touchstart", dragStart);
+viewport.addEventListener("touchstart", dragStart, { passive: false });
 
 window.addEventListener("mouseup", dragEnd);
 window.addEventListener("touchend", dragEnd);
 
 window.addEventListener("mousemove", drag);
-window.addEventListener("touchmove", drag);
+window.addEventListener("touchmove", drag, { passive: false });

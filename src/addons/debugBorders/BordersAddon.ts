@@ -1,4 +1,5 @@
-import { Addon, type AddonContext } from "../Addon";
+import type { AddonContext } from "../../core/context";
+import { Addon } from "../Addon";
 
 const colors = [
 	"#ff073a",

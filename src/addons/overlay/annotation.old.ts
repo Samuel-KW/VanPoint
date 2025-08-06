@@ -1,4 +1,5 @@
-import { Addon, type AddonContext } from "../Addon";
+import type { AddonContext } from "../../core/context";
+import { Addon } from "../Addon";
 
 class Line2D {
 	private locked = false;

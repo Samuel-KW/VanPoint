@@ -1,77 +1,7 @@
-import { Addon, type AddonContext } from "../Addon";
-
-
-class Line2D {
-	static endpointRadius = 5;
-	static endpointPadding = 5;
-
-	private color = Math.floor(Math.random() * 16777215).toString(16);
-
-	public x1;
-	public y1;
-	public x2;
-	public y2;
-
-	private canvas: HTMLCanvasElement;
-	private ctx: CanvasRenderingContext2D;
-
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x1 = 100, y1 = 150, x2 = 200, y2 = 300) {
-		this.canvas = canvas;
-		this.ctx = ctx;
-		
-		this.x1 = x1;
-		this.y1 = y1;
-		this.x2 = x2;
-		this.y2 = y2;
-	}
-
-	drawLine(offset: { x: number, y: number }): void {
-		const x1 = this.x1 + offset.x;
-		const y1 = this.y1 + offset.y;
-		const x2 = this.x2 + offset.x;
-		const y2 = this.y2 + offset.y;
-
-		const width = this.canvas.width;
-		const height = this.canvas.height;
-
-		const dx = x2 - x1;
-		if (dx === 0) {
-			this.ctx.beginPath();
-			this.ctx.moveTo(x1, 0);
-			this.ctx.lineTo(x1, height);
-			this.ctx.stroke();
-		}
-		
-		const slope = (y2 - y1) / dx;
-		const intercept = y1 - slope * x1;
-
-		this.ctx.strokeStyle = `#000`;
-		this.ctx.lineWidth = 2;
-		this.ctx.beginPath();
-		this.ctx.moveTo(0, intercept);
-		this.ctx.lineTo(width, slope * width + intercept);
-		this.ctx.stroke();
-	}
-
-	drawEndpoints(offset: { x: number, y: number }) {
-		const x1 = this.x1 + offset.x;
-		const y1 = this.y1 + offset.y;
-		const x2 = this.x2 + offset.x;
-		const y2 = this.y2 + offset.y;
-
-		this.ctx.fillStyle = `#${this.color}`;
-		this.ctx.strokeStyle = `#000`;
-		this.ctx.lineWidth = 2;
-		this.ctx.beginPath();
-		this.ctx.arc(x1, y1, Line2D.endpointRadius, 0, 2 * Math.PI);
-		this.ctx.fill();
-		this.ctx.stroke();
-		this.ctx.beginPath();
-		this.ctx.arc(x2, y2, Line2D.endpointRadius, 0, 2 * Math.PI);
-		this.ctx.fill();
-		this.ctx.stroke();
-	}
-}
+import type { AddonContext } from "../../core/context";
+import { Addon } from "../Addon";
+import { Line2D } from "./Line2D";
+import type { Point2D } from "./Point2D";
 
 export class OverlayAddon extends Addon {
 	id = "overlay";
@@ -86,6 +16,7 @@ export class OverlayAddon extends Addon {
 
 	private offset = { x: 0, y: 0 };
 	private dragListener?: (data: { x: number, y: number, dX: number, dY: number }) => void;
+	private moveListener?: (event: MouseEvent | TouchEvent) => void;
 
 	async onRegister(ctx: AddonContext) {
 		this.canvas = document.createElement("canvas");
@@ -118,11 +49,15 @@ export class OverlayAddon extends Addon {
 		this.dragListener = data => this.onDrag(data, ctx);
 		ctx.events.on("viewport:drag", this.dragListener);
 
+		this.moveListener = event => this.onMove(event, ctx);
+		window.addEventListener("mousemove", this.moveListener);
+		window.addEventListener("touchmove", this.moveListener, { passive: false });
+
 		this.addLine(new Line2D(this.canvas, this.context));
 	}
 
 	async onDisable(ctx: AddonContext) {
-		if (!this.dragListener) {
+		if (!this.dragListener || !this.moveListener) {
 			return;
 		}
 
@@ -135,6 +70,9 @@ export class OverlayAddon extends Addon {
 		}
 
 		ctx.events.off("viewport:drag", this.dragListener);
+		
+		window.removeEventListener("mousemove", this.moveListener);
+		window.removeEventListener("touchmove", this.moveListener);
 	}
 
 	async onDestroy(_: AddonContext) {
@@ -143,6 +81,8 @@ export class OverlayAddon extends Addon {
 		this.canvas = undefined;
 		this.context = undefined;
 		this.animationFrame = undefined;
+		this.dragListener = undefined;
+		this.moveListener = undefined;
 	}
 
 	addLine(line: Line2D) {
@@ -161,8 +101,9 @@ export class OverlayAddon extends Addon {
 		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
 		for (const line of this.lines) {
-			line.drawLine(this.offset);
-			line.drawEndpoints(this.offset);
+			line.setOffset(this.offset.x, this.offset.y);
+			line.drawLine();
+			line.drawEndpoints();
 		}
 	};
 
@@ -173,5 +114,49 @@ export class OverlayAddon extends Addon {
 	onDrag(data: { x: number, y: number, dX: number, dY: number }, ctx: AddonContext) {
 		this.offset.x += data.dX;
 		this.offset.y += data.dY;
+	}
+
+	onMove(event: MouseEvent | TouchEvent, ctx: AddonContext) {
+		let x, y;
+		if (event instanceof TouchEvent) {
+			x = event.touches[0].clientX;
+			y = event.touches[0].clientY;
+		} else {
+			x = event.clientX;
+			y = event.clientY;
+		}
+		
+		x -= ctx.ui.viewport.offsetLeft;
+		y -= ctx.ui.viewport.offsetTop;
+
+		// Update radius of line points based on distance
+		let closestDist = Infinity;
+		let cloestPoint: Point2D | null = null;
+
+		for (const line of this.lines) {
+			const distStart = line.start.distanceApprox(x, y, this.offset);
+			line.start.emphasis = Math.min(7, Math.max(0, -0.1 * distStart + 10));
+			line.start.selected = false;
+			
+			const distEnd = line.end.distanceApprox(x, y, this.offset);
+			line.end.emphasis = Math.min(7, Math.max(0, -0.1 * distEnd + 10));
+			line.end.selected = false;
+
+			if (distStart < distEnd) {
+				if (distStart < closestDist) {
+					closestDist = distStart;
+					cloestPoint = line.start;
+				}
+			} else {
+				if (distEnd < closestDist) {
+					closestDist = distEnd;
+					cloestPoint = line.end;
+				}
+			}
+		}
+
+		if (cloestPoint) {
+			cloestPoint.selected = true;
+		}
 	}
 }

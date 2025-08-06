@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { ViewHelper } from "three/addons/helpers/ViewHelper.js";
-import { Addon, type AddonContext } from "../Addon";
+import type { AddonContext } from "../../core/context";
+import { Addon } from "../Addon";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 
 export class ViewportAddon extends Addon {

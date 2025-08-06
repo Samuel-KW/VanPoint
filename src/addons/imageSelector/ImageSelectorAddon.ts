@@ -1,5 +1,6 @@
 import "./imageSelectorStyle.css"
-import { Addon, type AddonContext } from "../Addon";
+import type { AddonContext } from "../../core/context";
+import { Addon } from "../Addon";
 
 export class ImageSelectorAddon extends Addon {
 	id = "imageSelector";

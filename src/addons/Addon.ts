@@ -1,5 +1,4 @@
-import { PerspectiveCamera, Scene, WebGLRenderer } from "three";
-import type { on, off, emit } from "../core/events";
+import type { AddonContext } from "../core/context";
 
 export class Addon {
 	id: string = "";
@@ -12,21 +11,4 @@ export class Addon {
 	onDisable(_: AddonContext): Promise<void> | void { throw new Error("onDisable() method not implemented"); }
 	onDestroy(_: AddonContext): Promise<void> | void { throw new Error("onDestroy() method not implemented"); }
 	exports(): any { throw new Error("exports() method not implemented"); }
-}
-
-export interface AddonContext {
-	viewport: {
-		scene: Scene;
-		camera: PerspectiveCamera;
-		renderer: WebGLRenderer;
-	};
-	ui: {
-		toolbar: HTMLElement;
-		propertyPanel: HTMLElement;
-		widgets: HTMLElement;
-		viewport: HTMLElement;
-	};
-	debug: boolean;
-	events: { on: typeof on; off: typeof off; emit: typeof emit };
-	exports: <T = any>(id: string) => T | undefined;
 }

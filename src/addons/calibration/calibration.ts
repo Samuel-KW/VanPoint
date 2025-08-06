@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { Addon, type AddonContext } from "../Addon";
+import { Addon } from "../Addon";
+import type { AddonContext } from "../../core/context";
 
 export class CalibrationAddon extends Addon {
 	id = "calibration";

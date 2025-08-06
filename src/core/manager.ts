@@ -1,31 +1,16 @@
 import { Scene, PerspectiveCamera, WebGLRenderer } from "three";
-import type { Addon, AddonContext } from "../addons/Addon";
+import type { Addon } from "../addons/Addon";
 import { on, off, emit } from "./events";
+import { context, type AddonContext } from "./context";
 
 export default class AddonManager {
 	private addons: Map<string, Addon> = new Map();
-	private context: AddonContext;
 	private exports: Record<string, any> = {};
 
 	constructor(debug = false) {
-		const self = this;
-		this.context = {
-			viewport: {
-				scene:  new Scene(),
-				camera: new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000),
-				renderer: new WebGLRenderer({ antialias: true, alpha: true })
-			},
-			ui: {
-				toolbar: document.getElementById("toolbar") as HTMLDivElement,
-				propertyPanel: document.getElementById("property-panel") as HTMLDivElement,
-				widgets: document.getElementById("widgets") as HTMLDivElement,
-				viewport: document.getElementById("viewport") as HTMLDivElement
-			},
-			debug,
-			events: { on, off, emit },
-			exports(id) {
-				return self.addons.get(id)?.exports();
-			}
+		context.debug = debug;
+		context.exports = id => {
+			return this.addons.get(id)?.exports();
 		}
 	}
 
@@ -37,7 +22,7 @@ export default class AddonManager {
 	async register(addon: Addon) {
 		try {
 			if (typeof addon.onRegister === "function") {
-				await addon.onRegister(this.context);
+				await addon.onRegister(context);
 				this.exports[addon.id] = addon.exports();
 				this.addons.set(addon.id, addon);
 			}
@@ -58,7 +43,7 @@ export default class AddonManager {
 		try {
 			await this.disable(addon);
 			if (typeof addon.onDestroy === "function") {
-				await addon.onDestroy(this.context);
+				await addon.onDestroy(context);
 				this.addons.delete(addon.id);
 			}
 			console.log(`[Addon] Removed: ${addon.name}`);
@@ -87,7 +72,7 @@ export default class AddonManager {
 		try {
 			if (typeof addon.onEnable === "function") {
 				addon.enabled = true;
-				await addon.onEnable(this.context);
+				await addon.onEnable(context);
 				console.log(`[Addon] Enabled: ${addon.name}`);
 			}
 		} catch (e) {
@@ -115,7 +100,7 @@ export default class AddonManager {
 		try {
 			if (typeof addon.onDisable === "function") {
 				addon.enabled = false;
-				await addon.onDisable(this.context);
+				await addon.onDisable(context);
 				console.log(`[Addon] Disabled: ${addon.name}`);
 			}
 		} catch (e) {

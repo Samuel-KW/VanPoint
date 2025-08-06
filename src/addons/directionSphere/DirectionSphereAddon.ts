@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { Addon, type AddonContext } from "../Addon";
+import type { AddonContext } from "../../core/context";
+import { Addon } from "../Addon";
 
 export class DirectionSphereAddon extends Addon {
 	id = "debugDirectionSphere";
