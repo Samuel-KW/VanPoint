@@ -10,6 +10,8 @@ export class CalibrationAddon extends Addon {
 	private button?: HTMLButtonElement;
 	private properties?: HTMLDivElement;
 
+	private vanishingPointsListener?: (points: [number, number, number][]) => void;
+
 	async onRegister(ctx: AddonContext) {
 		this.camera = ctx.viewport.camera;
 
@@ -39,6 +41,9 @@ export class CalibrationAddon extends Addon {
 
 		this.camera = ctx.viewport.camera;
 
+		this.vanishingPointsListener = (points) => this.onVanishingPoints(points);
+		ctx.events.on("calibration:vanishingPoints", this.vanishingPointsListener);
+
 		ctx.ui.widgets.appendChild(this.button);
 		ctx.ui.propertyPanel.appendChild(this.properties);
 	}
@@ -64,6 +69,14 @@ export class CalibrationAddon extends Addon {
 
 	exports() {
 		return { camera: this.camera };
+	}
+
+	onVanishingPoints(points: [number, number, number][]) {
+		console.log(points);
+
+		if (points.length === 1) {
+
+		}
 	}
 
 	/**
@@ -134,5 +147,28 @@ export class CalibrationAddon extends Addon {
 		const y = (A * E - B * D) / det;
 
 		return [x, y];
+	}
+
+	/**
+	 * Computes the 3D direction vector from a vanishing point in image space.
+	 * @param vp - Vanishing point [x, y] in pixels
+	 * @param focalLength - Focal length in pixels (e.g., fx = fy = f)
+	 * @param principalPoint - Principal point [cx, cy] in pixels
+	 * @returns 3D direction vector (not normalized)
+	 */
+	vanishingPointToDirection(
+		vp: [number, number],
+		focalLength: number,
+		principalPoint: [number, number]
+	): [number, number, number] {
+		const [x, y] = vp;
+		const [cx, cy] = principalPoint;
+
+		// Convert to normalized camera coordinates using inverse of K
+		const dx = (x - cx) / focalLength;
+		const dy = (y - cy) / focalLength;
+		const dz = 1;
+
+		return [dx, dy, dz];
 	}
 }

@@ -86,7 +86,7 @@ export class ViewportAddon extends Addon {
 		ctx.ui.viewport.appendChild(this.renderer.domElement);
 
 		this.animate();
-	}	
+	}
 
 	async onDisable(ctx: AddonContext) {
 		if (!this.scene || !this.camera || !this.renderer || !this.ambientLight || !this.directionalLight || !this.dragListener || !this.imageLoadListener) {
