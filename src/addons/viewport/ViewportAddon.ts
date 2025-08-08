@@ -37,9 +37,7 @@ export class ViewportAddon extends Addon {
 		this.scene = ctx.viewport.scene;
 
 		this.renderer = ctx.viewport.renderer;
-		this.renderer.setPixelRatio(window.devicePixelRatio);
-		this.renderer.setSize(width, height);
-		this.renderer.autoClear = false;
+		
 
 		this.camera = ctx.viewport.camera;
 		this.camera.position.set(0, 10, 15);

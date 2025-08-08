@@ -1,64 +1,78 @@
-import { emit } from "../../../core/events";
 import "./viewport.css";
+import "./2d.ts";
+import "./3d.ts";
+import { context } from "../../../core/context.ts";
+import { draw3D, updateScale3D } from "./3d.ts";
+import { draw2D } from "./2d.ts";
 
-const viewport = document.getElementById("viewport") as HTMLDivElement;
-
-let prevX = 0;
-let prevY = 0;
+let offset = { x: 0, y: 0 };
+let scale = 1;
 let dragging = false;
 
-const drag = (event: MouseEvent | TouchEvent) => {
-	if (!dragging) {
-		return;
-	}
+const viewport = context.ui.viewport;
 
-	let x, y;
-	if (event instanceof TouchEvent) {
-		if (event.touches.length !== 2) {
-			return;
-		}
-		x = event.touches[0].clientX - viewport.offsetLeft;
-		y = event.touches[0].clientY - viewport.offsetTop;	
-		event.preventDefault();
-	} else {
-		if (event.buttons !== 1) {
-			return;
-		}
-		x = event.clientX - viewport.offsetLeft;
-		y = event.clientY - viewport.offsetTop;
-	}
+viewport.oncontextmenu = () => false;
 
-	emit("viewport:drag", { x, y, dX: x - prevX, dY: y - prevY });
-
-	prevX = x;
-	prevY = y;
+const updateScale = (delta: number) => {
+	scale = Math.max(0.1, Math.min(3, scale + delta));
+	updateScale3D(scale);
 };
 
-const dragStart = (event: MouseEvent | TouchEvent) => {
-	dragging = true;
+const animate = () => {
+	requestAnimationFrame(() => animate());
+	draw2D(offset, scale);
+	draw3D(offset);
+}
 
-	if (event instanceof TouchEvent) {
-		prevX = event.touches[0].clientX - viewport.offsetLeft;
-		prevY = event.touches[0].clientY - viewport.offsetTop;	
-	} else {
-		prevX = event.clientX - viewport.offsetLeft;
-		prevY = event.clientY - viewport.offsetTop;
+const onDrag = ({ dX, dY }: { dX: number, dY: number }) => {
+	if (dragging && context.mouse.button.right) {
+		if (context.keyboard.ctrl) {
+			dX /= 5;
+			dY /= 5;
+		}
+		offset.x += dX;
+		offset.y += dY;
 	}
-
-	emit("viewport:dragStart", { x: prevX, y: prevY });
-	drag(event);
 };
 
-const dragEnd = () => {
+const onUp = () => {
 	dragging = false;
-	emit("viewport:dragEnd");
 };
 
-viewport.addEventListener("mousedown", dragStart);
-viewport.addEventListener("touchstart", dragStart, { passive: false });
+const onDown = () => {
+	dragging = true;
+};
 
-window.addEventListener("mouseup", dragEnd);
-window.addEventListener("touchend", dragEnd);
+const onWheel = (event: WheelEvent) => {
 
-window.addEventListener("mousemove", drag);
-window.addEventListener("touchmove", drag, { passive: false });
+	const delta = -event.deltaY / 800;
+	updateScale(delta);
+
+	// Get scale pivot
+	const pivotX = context.mouse.x - viewport.offsetLeft;
+	const pivotY = context.mouse.y - viewport.offsetTop;
+
+	// Transform to account for pivot
+	// offset.x = (offset.x - pivotX) * scale + pivotX;
+	// offset.y = (offset.y - pivotY) * scale + pivotY;
+
+	event.preventDefault();
+	event.stopImmediatePropagation();
+};
+
+context.events.on("image:load", ({ width, height }: { width: number, height: number }) => {
+	const availWidth = context.ui.viewport.offsetWidth;
+	const availHeight = context.ui.viewport.offsetHeight;
+
+	scale = Math.min(availWidth / width, availHeight / height);
+	updateScale(0);
+});
+
+context.events.on("mouse:move", onDrag);
+viewport.addEventListener("mousedown", onDown);
+viewport.addEventListener("touchstart", onDown, { passive: false });
+window.addEventListener("mouseup", onUp);
+window.addEventListener("touchend", onUp);
+window.addEventListener("wheel", onWheel, { passive: false });
+
+animate();

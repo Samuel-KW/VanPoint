@@ -2,10 +2,9 @@
 import { Point2D } from "./Point2D";
 
 export class Line2D {
+	
 	start;
 	end;
-
-	offset = { x: 0, y: 0 };
 
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
@@ -20,15 +19,19 @@ export class Line2D {
 	}
 
 	drawLine(): void {
-		const x1 = this.start.x + this.offset.x;
-		const y1 = this.start.y + this.offset.y;
-		const x2 = this.end.x + this.offset.x;
-		const y2 = this.end.y + this.offset.y;
+		this.ctx.strokeStyle = `#000`;
+		this.ctx.lineWidth = 1;
+
+		const x1 = this.start.local.x;
+		const y1 = this.start.local.y;
+		const x2 = this.end.local.x;
+		const y2 = this.end.local.y;
 
 		const width = this.canvas.width;
 		const height = this.canvas.height;
 
 		const dx = x2 - x1;
+		
 		if (dx === 0) {
 			this.ctx.beginPath();
 			this.ctx.moveTo(x1, 0);
@@ -39,8 +42,6 @@ export class Line2D {
 		const slope = (y2 - y1) / dx;
 		const intercept = y1 - slope * x1;
 
-		this.ctx.strokeStyle = `#000`;
-		this.ctx.lineWidth = 2;
 		this.ctx.beginPath();
 		this.ctx.moveTo(0, intercept);
 		this.ctx.lineTo(width, slope * width + intercept);
@@ -48,11 +49,7 @@ export class Line2D {
 	}
 
 	drawEndpoints() {
-		this.start.draw(this.ctx, this.offset);
-		this.end.draw(this.ctx, this.offset);
-	}
-
-	setOffset(x: number, y: number) {
-		this.offset = { x, y };
+		this.start.draw(this.ctx);
+		this.end.draw(this.ctx);
 	}
 }
