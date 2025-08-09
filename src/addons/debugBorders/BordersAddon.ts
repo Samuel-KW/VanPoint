@@ -36,15 +36,15 @@ export class DebugBordersAddon extends Addon {
 		let index = 0;
 		for (const name in ctx.ui) {
 			const elem = ctx.ui[name as keyof typeof ctx.ui];
-			elem.setAttribute("data-default-border", elem.style.border);
-			elem.style.border = "3px solid " + colors[index++ % colors.length];
+			elem.setAttribute("data-default-shadow", elem.style.boxShadow || "");
+			elem.style.boxShadow = "inset 0 0 0px 3px " + colors[index++ % colors.length];
 		}
 	}
 
 	async onDisable(ctx: AddonContext) {
 		for (const name in ctx.ui) {
 			const elem = ctx.ui[name as keyof typeof ctx.ui];
-			elem.style.border = elem.getAttribute("data-default-border") || "";
+			elem.style.boxShadow = elem.getAttribute("data-default-border") || "";
 			elem.removeAttribute("data-default-border");
 		}
 	}
