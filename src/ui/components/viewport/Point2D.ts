@@ -1,4 +1,4 @@
-import RelPoint2D from "./RelPoint2D";
+import RelPoint2D from "./RelPoint2d";
 
 export class Point2D extends RelPoint2D {
 	radius = 6;

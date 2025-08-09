@@ -4,6 +4,7 @@ import "./3d.ts";
 import { context } from "../../../core/context.ts";
 import { draw3D, updateScale3D } from "./3d.ts";
 import { draw2D } from "./2d.ts";
+import RelPoint2D from "./RelPoint2d.ts";
 
 let offset = { x: 0, y: 0 };
 let scale = 1;
@@ -14,8 +15,10 @@ const viewport = context.ui.viewport;
 viewport.oncontextmenu = () => false;
 
 const updateScale = (delta: number) => {
-	scale = Math.max(0.1, Math.min(3, scale + delta));
-	updateScale3D(scale);
+	const newScale = Math.max(0.1, Math.min(3, scale + delta));
+	RelPoint2D.scale = newScale;
+	updateScale3D(newScale);
+	return newScale;
 };
 
 const animate = () => {
@@ -32,6 +35,7 @@ const onDrag = ({ dX, dY }: { dX: number, dY: number }) => {
 		}
 		offset.x += dX;
 		offset.y += dY;
+		RelPoint2D.offset = offset;
 	}
 };
 
@@ -45,16 +49,12 @@ const onDown = () => {
 
 const onWheel = (event: WheelEvent) => {
 
+	const oldScale = scale;
 	const delta = -event.deltaY / 800;
-	updateScale(delta);
+	scale = updateScale(delta);
 
-	// Get scale pivot
-	const pivotX = context.mouse.x - viewport.offsetLeft;
-	const pivotY = context.mouse.y - viewport.offsetTop;
-
-	// Transform to account for pivot
-	// offset.x = (offset.x - pivotX) * scale + pivotX;
-	// offset.y = (offset.y - pivotY) * scale + pivotY;
+	offset.x = context.mouse.x - ((context.mouse.x - offset.x) / oldScale) * scale;
+	offset.y = context.mouse.y - ((context.mouse.y - offset.y) / oldScale) * scale;
 
 	event.preventDefault();
 	event.stopImmediatePropagation();
@@ -65,7 +65,7 @@ context.events.on("image:load", ({ width, height }: { width: number, height: num
 	const availHeight = context.ui.viewport.offsetHeight;
 
 	scale = Math.min(availWidth / width, availHeight / height);
-	updateScale(0);
+	scale = updateScale(0);
 });
 
 context.events.on("mouse:move", onDrag);

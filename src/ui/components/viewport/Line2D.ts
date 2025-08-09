@@ -1,5 +1,5 @@
 
-import { Point2D } from "./Point2D";
+import { Point2D } from "./Point2d";
 
 export class Line2D {
 	

@@ -1,11 +1,12 @@
 import { context } from "../../../core/context";
-import { Line2D } from "./Line2D";
-import { Point2D } from "./Point2D";
-import RelPoint2D from "./RelPoint2D";
+import { Line2D } from "./Line2d";
+import { Point2D } from "./Point2d";
+import RelPoint2D from "./RelPoint2d";
 
 let lines: Line2D[] = [];
+let closestPoint: Point2D | null = null;
 
-const canvas = document.getElementById("canvas-2d") as HTMLCanvasElement;
+const canvas = context.ui.canvas2d;
 const ctx = canvas.getContext("2d")!;
 
 const viewport = context.ui.viewport;
@@ -28,72 +29,76 @@ const resize = () => {
 	canvas.width = viewport.offsetWidth;
 	canvas.height = viewport.offsetHeight;
 };
-resize();
+
+const onDown = ({ event }: { event: MouseEvent | TouchEvent }) => {
+	if (event.target !== context.ui.canvas2d && event.target !== context.ui.canvas3d) {
+		return;
+	}
+
+	const mouseX = context.mouse.x;
+	const mouseY = context.mouse.y;
+
+	let tmpDist = Infinity;
+	let tmpPoint: Point2D | null = null;
+	for (const line of lines) {
+		const distStart = line.start.distanceLocalApprox(mouseX, mouseY);
+		const distEnd = line.end.distanceLocalApprox(mouseX, mouseY);
+
+		if (distStart < distEnd) {
+			if (distStart < tmpDist) {
+				tmpDist = distStart;
+				tmpPoint = line.start;
+			}
+		} else {
+			if (distEnd < tmpDist) {
+				tmpDist = distEnd;
+				tmpPoint = line.end;
+			}
+		}
+	}
+
+
+	if (tmpPoint) {
+		if (tmpPoint !== closestPoint) {
+			if (closestPoint) {
+				closestPoint.selected = false;
+				closestPoint.dragging = false;
+			}
+			closestPoint = tmpPoint;
+		}
+		
+		if (context.mouse.button.left) {
+			tmpPoint.dragging = tmpPoint.contains(mouseX, mouseY);
+			tmpPoint.selected = true;
+		}
+	}
+};
+
+const onUp = () => {
+	if (closestPoint) {
+		closestPoint.dragging = false;
+	}
+};
+
+context.events.on("mouse:down", onDown);
+context.events.on("mouse:up", onUp);
 
 const observer = new ResizeObserver(resize);
 observer.observe(viewport);
 
+resize();
+
 addLine(new Line2D(canvas, ctx));
 
-let selectedPoint: Point2D | null = null;
 
 export const draw2D = (offset: { x: number, y: number }, scale: number) => {
 	const mouseX = context.mouse.x;
 	const mouseY = context.mouse.y;
 
-	RelPoint2D.offset = offset;
-	RelPoint2D.scale = scale;
-
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	ctx.drawImage(background, 0, 0, background.width, background.height, offset.x, offset.y, background.width * scale, background.height * scale);
 	
-
-	let closestDist = Infinity;
-	let closestPoint: Point2D | null = null;
-
-	for (const line of lines) {
-		const distStart = line.start.emphasizeFromWorld(mouseX, mouseY);
-		const distEnd = line.end.emphasizeFromWorld(mouseX, mouseY);
-
-		if (distStart < distEnd) {
-			if (distStart < closestDist) {
-				closestDist = distStart;
-				closestPoint = line.start;
-			}
-		} else {
-			if (distEnd < closestDist) {
-				closestDist = distEnd;
-				closestPoint = line.end;
-			}
-		}
-
-		line.drawLine();
-		line.drawEndpoints();
-	}
-
-	if (closestPoint) {
-		
-		if (closestPoint !== selectedPoint) {
-			if (selectedPoint) {
-				selectedPoint.selected = false;
-				selectedPoint.dragging = false;
-			}
-			selectedPoint = closestPoint;
-		}
-
-		closestPoint.selected = true;
-		
-		if (context.mouse.button.left && closestPoint.contains(mouseX, mouseY)) {
-			
-			// Set point position
-			closestPoint.dragging = true;
-			closestPoint.setLocalPositionFromScreen(mouseX, mouseY);
-		} else {
-			closestPoint.dragging = false;
-		}
-	}
-
 	if (context.keyboard.shift) {
 		const margin = 10;
 		const destSize = 150;
@@ -125,4 +130,18 @@ export const draw2D = (offset: { x: number, y: number }, scale: number) => {
 		// Draw border
 		ctx.strokeRect(canvas.width - destSize - margin, margin, destSize, destSize);
 	}
+
+	if (closestPoint && closestPoint.dragging) {
+		closestPoint.setLocalPositionFromScreen(mouseX, mouseY);
+	}
+
+	for (const line of lines) {
+		line.start.emphasizeFromWorld(mouseX, mouseY);
+		line.end.emphasizeFromWorld(mouseX, mouseY);
+
+		line.drawLine();
+		line.drawEndpoints();
+	}
+
+	context.viewport.mouse.visualize(ctx, { color: "#fff", radius: 3, stroke: "#fff", strokeWidth: 1 });
 };
