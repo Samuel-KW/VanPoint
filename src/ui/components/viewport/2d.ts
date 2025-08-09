@@ -1,9 +1,7 @@
 import { context } from "../../../core/context";
 import { Line2D } from "./Line2d";
 import { Point2D } from "./Point2d";
-import RelPoint2D from "./RelPoint2d";
 
-let lines: Line2D[] = [];
 let closestPoint: Point2D | null = null;
 
 const canvas = context.ui.canvas2d;
@@ -16,14 +14,6 @@ let background = new Image();
 context.events.on("image:load", ({ image }: { image: HTMLImageElement }) => {
 	background = image;
 });
-
-export const addLine = (line: Line2D) => {
-	lines.push(line);
-};
-
-export const removeLine = (line: Line2D) => {
-	lines = lines.filter(l => l !== line);
-};
 
 const resize = () => {
 	canvas.width = viewport.offsetWidth;
@@ -40,7 +30,7 @@ const onDown = ({ event }: { event: MouseEvent | TouchEvent }) => {
 
 	let tmpDist = Infinity;
 	let tmpPoint: Point2D | null = null;
-	for (const line of lines) {
+	for (const line of context.viewport.lines2d) {
 		const distStart = line.start.distanceLocalApprox(mouseX, mouseY);
 		const distEnd = line.end.distanceLocalApprox(mouseX, mouseY);
 
@@ -57,6 +47,13 @@ const onDown = ({ event }: { event: MouseEvent | TouchEvent }) => {
 		}
 	}
 
+	for (const point of context.viewport.points2d) {
+		const dist = point.distanceLocalApprox(mouseX, mouseY);
+		if (dist < tmpDist) {
+			tmpDist = dist;
+			tmpPoint = point;
+		}
+	}
 
 	if (tmpPoint) {
 		if (tmpPoint !== closestPoint) {
@@ -87,9 +84,6 @@ const observer = new ResizeObserver(resize);
 observer.observe(viewport);
 
 resize();
-
-addLine(new Line2D(canvas, ctx));
-
 
 export const draw2D = (offset: { x: number, y: number }, scale: number) => {
 	const mouseX = context.mouse.x;
@@ -135,12 +129,16 @@ export const draw2D = (offset: { x: number, y: number }, scale: number) => {
 		closestPoint.setLocalPositionFromScreen(mouseX, mouseY);
 	}
 
-	for (const line of lines) {
+	for (const line of context.viewport.lines2d) {
 		line.start.emphasizeFromWorld(mouseX, mouseY);
 		line.end.emphasizeFromWorld(mouseX, mouseY);
 
 		line.drawLine();
 		line.drawEndpoints();
+	}
+
+	for (const point of context.viewport.points2d) {
+		point.draw(ctx);
 	}
 
 	context.viewport.mouse.visualize(ctx, { color: "#fff", radius: 3, stroke: "#fff", strokeWidth: 1 });

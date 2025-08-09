@@ -9,11 +9,10 @@ export class Line2D {
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
 
-	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x1 = 100, y1 = 150, x2 = 200, y2 = 300) {
+	constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, x1 = 100, y1 = 150, x2 = 200, y2 = 300, color = `#${Math.floor(Math.random() * 16777215).toString(16)}`) {
 		this.canvas = canvas;
 		this.ctx = ctx;
 		
-		const color = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
 		this.start = new Point2D(x1, y1, color);
 		this.end = new Point2D(x2, y2, color);
 	}
